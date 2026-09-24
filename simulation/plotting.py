@@ -1,461 +1,337 @@
+"""Measured power, paired improvements and receiver-plane visualizations."""
 from __future__ import annotations
-
 from pathlib import Path
-
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.patches import Circle
+from matplotlib.lines import Line2D
+from matplotlib.ticker import MaxNLocator
+from matplotlib.colors import LogNorm
+
+COLORS = {"Frozen-PINN": "#2166AC", "PID": "#E68613", "Linear MPC": "#4D9A75",
+          "Diff-SSFM oracle": "#A45D92", "SSFM oracle (CPU-FD)": "#A45D92", "No control": "#9B9FA5"}
+LABELS = {"Diff-SSFM oracle": "SSFM oracle", "SSFM oracle (CPU-FD)": "SSFM oracle (FD)"}
+plt.rcParams.update({"font.size": 10, "axes.titlesize": 11, "axes.labelsize": 10,
+                     "figure.facecolor": "white", "axes.facecolor": "white",
+                     "savefig.facecolor": "white", "font.family": "DejaVu Sans"})
 
 
-def _objective_label(objective: str) -> tuple[str, str]:
-    if objective == "power":
-        return "Receive power", "PAT receive-power comparison"
-    if objective == "coupling":
-        return "SMF coupling efficiency", "PAT coupling-efficiency comparison"
-    return "Centroid tracking error [mm]", "PAT centroid-tracking comparison"
+def _color(name):
+    return COLORS.get(name, "#555555")
 
 
-def _is_no_control(solver_name: str) -> bool:
-    key = solver_name.lower().replace("-", " ").replace("_", " ").strip()
-    return key in {"no control", "none"}
+def _label(name):
+    return LABELS.get(name, name)
 
 
-def _controlled_solver_results(solver_results):
-    controlled = {
-        name: payload
-        for name, payload in solver_results.items()
-        if not _is_no_control(name)
-    }
-    return controlled if controlled else solver_results
+def _controlled_solver_results(results):
+    controlled = {k: v for k, v in results.items() if k != "No control"}
+    return controlled or results
 
 
-def _set_metric_ylim(ax, values, objective: str):
-    finite = np.asarray(
-        [v for v in values if np.isfinite(v)],
-        dtype=float,
-    )
-    if finite.size == 0:
-        return
-
-    ymin = float(np.min(finite))
-    ymax = float(np.max(finite))
-
-    if abs(ymax - ymin) < 1e-15:
-        pad = max(abs(ymax), 1.0) * 0.05
-    else:
-        pad = 0.12 * (ymax - ymin)
-
-    lower = max(0.0, ymin - pad) if objective == "centroid" and ymin >= 0 else ymin - pad
-    ax.set_ylim(lower, ymax + pad)
+def _style(ax, *, grid="y"):
+    ax.spines[["top", "right"]].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_color("#C9CDD2")
+    ax.tick_params(color="#C9CDD2", labelcolor="#42464C", length=3)
+    ax.grid(axis=grid, color="#E6E8EB", linewidth=0.6)
+    ax.set_axisbelow(True)
+    ax.yaxis.set_major_locator(MaxNLocator(5))
 
 
-def _draw_objective_curves(ax, objective: str, solver_results):
-    values_for_limits = []
+def _legend(fig, names, *, y=0.96):
+    handles = [Line2D([0], [0], color=_color(n), lw=2,
+                     ls="--" if n == "No control" else "-", label=_label(n)) for n in names]
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(.5, y),
+               ncol=min(len(names), 5), frameon=False, fontsize=9, handlelength=2)
 
-    for solver_name, payload in solver_results.items():
+
+def _save(fig, path, *, legend=False):
+    fig.tight_layout(rect=(0, 0.02, 1, 0.86 if legend else 0.92), pad=1.5)
+    fig.savefig(path, dpi=180)
+    plt.close(fig)
+    return path
+
+
+def _times(records):
+    return np.array([r.get("time_sec", r["interval"]) for r in records], dtype=float)
+
+
+def _values(payload):
+    return np.asarray([r["display_metric"] for r in payload["records"]], dtype=float)
+
+
+def _gains(results):
+    if "No control" not in results:
+        return {}
+    baseline = _values(results["No control"])
+    gains = {}
+    for name, payload in _controlled_solver_results(results).items():
+        values = _values(payload)
+        gains[name] = np.divide(values-baseline, baseline, out=np.full_like(values, np.nan), where=baseline>0)*100
+    return gains
+
+
+def _draw_power(ax, results):
+    # No markers on every interval: the time series remains legible at 100+ points.
+    for name, payload in results.items():
         records = payload["records"]
-        k = np.arange(len(records))
-        values = np.asarray(
-            [r["display_metric"] for r in records],
-            dtype=float,
-        )
-
-        kwargs = {}
-        if _is_no_control(solver_name):
-            kwargs.update(
-                linestyle="--",
-                alpha=0.65,
-                linewidth=1.6,
-            )
-
-        ax.plot(
-            k,
-            values,
-            marker="o",
-            label=solver_name,
-            **kwargs,
-        )
-        values_for_limits.extend(values.tolist())
-
-    ylabel, title = _objective_label(objective)
-    ax.set_xlabel("PAT control interval k")
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    ax.grid(True, alpha=0.25)
-    ax.legend()
-    return values_for_limits
+        ax.plot(_times(records), _values(payload)*1e3, color=_color(name),
+                lw=1.25, ls="--" if name == "No control" else "-", alpha=.9,
+                marker="o" if len(records) == 1 else None, ms=4)
+    ax.set(xlabel="Time [s]", ylabel="Collected power [mW]", ylim=(0, None))
+    _style(ax)
 
 
-def plot_objective_comparison(output_dir: Path, objective: str, solver_results):
-    """Save a controller-focused graph plus a complete graph with No control."""
+def _draw_gain_distribution(ax, gains):
+    for name, values in gains.items():
+        values = np.sort(values[np.isfinite(values)])
+        if len(values):
+            ax.step(values, np.arange(1, len(values)+1)/len(values), where="post",
+                    color=_color(name), lw=1.8)
+            if len(values) == 1:
+                ax.plot(values, [1], "o", color=_color(name), ms=4)
+    ax.axvline(0, color="#A9ADB2", lw=.8, ls="--")
+    ax.set(xlabel="Power change from No control [%]", ylabel="Fraction of intervals",
+           ylim=(0, 1.04), title="Controller differences on the same channel")
+    _style(ax)
+
+
+def plot_objective_comparison(output_dir, objective, solver_results):
+    output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    controlled = _controlled_solver_results(solver_results)
-
-    fig, ax = plt.subplots(figsize=(7.6, 4.5))
-    values = _draw_objective_curves(ax, objective, controlled)
-    _set_metric_ylim(ax, values, objective)
-    fig.tight_layout()
-    path = output_dir / "objective_comparison.png"
-    fig.savefig(path, dpi=190)
-    plt.close(fig)
-
-    fig, ax = plt.subplots(figsize=(7.6, 4.5))
-    _draw_objective_curves(ax, objective, solver_results)
-    fig.tight_layout()
-    all_path = output_dir / "objective_comparison_all.png"
-    fig.savefig(all_path, dpi=190)
-    plt.close(fig)
-
-    return path
-
-
-def plot_runtime_comparison(output_dir: Path, solver_results):
-    names = []
-    runtime = []
-    for solver_name, payload in solver_results.items():
-        records = payload["records"]
-        names.append(solver_name)
-        runtime.append(np.mean([r["runtime_sec"] for r in records]))
-    x = np.arange(len(names))
-    plt.figure(figsize=(7.4, 4.5))
-    plt.bar(x, runtime)
-    plt.xticks(x, names, rotation=20, ha="right")
-    plt.ylabel("Mean control runtime per interval [s]")
-    plt.title("Online control runtime")
-    plt.tight_layout()
-    path = output_dir / "runtime_comparison.png"
-    plt.savefig(path, dpi=190)
-    plt.close()
-    return path
-
-
-def plot_centroid_trajectories(output_dir: Path, solver_results):
-    plt.figure(figsize=(6.2, 6.0))
-    first_payload = next(iter(solver_results.values()))
-    target = np.asarray([r["target"] for r in first_payload["records"]])
-    plt.plot(
-        target[:, 0] * 1e3,
-        target[:, 1] * 1e3,
-        linestyle="--",
-        marker=".",
-        label="Rx target",
-    )
-    for solver_name, payload in solver_results.items():
-        centroid = np.asarray([r["actual_centroid"] for r in payload["records"]])
-        plt.plot(
-            centroid[:, 0] * 1e3,
-            centroid[:, 1] * 1e3,
-            marker="o",
-            label=solver_name,
-        )
-
-        if solver_name == "Frozen-PINN" and all(
-            "predicted_centroid" in r for r in payload["records"]
-        ):
-            pred = np.asarray([r["predicted_centroid"] for r in payload["records"]])
-            plt.plot(
-                pred[:, 0] * 1e3,
-                pred[:, 1] * 1e3,
-                linestyle=":",
-                marker=".",
-                label="Frozen-PINN predicted",
-            )
-    plt.xlabel("x [mm]")
-    plt.ylabel("y [mm]")
-    plt.title("2D centroid trajectories")
-    plt.axis("equal")
-    plt.grid(True, alpha=0.3)
-    plt.legend()
-    plt.tight_layout()
-    path = output_dir / "centroid_trajectories.png"
-    plt.savefig(path, dpi=190)
-    plt.close()
-    return path
-
-
-def save_centroid_tracking_gifs(output_dir: Path, solver_results, system, fps: int = 3):
-    """Create the centroid GIF in the original two-panel tracking style.
-
-    Left: actual SSFM intensity map for the Frozen-PINN command, target Rx
-    center, actual centroid, and Frozen-PINN predicted centroid.
-
-    Right: target / actual / Frozen-PINN predicted centroid trajectories.
-    """
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    if "Frozen-PINN" in solver_results:
-        payload = solver_results["Frozen-PINN"]
+    gains = _gains(solver_results)
+    if gains:
+        fig, axes = plt.subplots(1, 2, figsize=(11.2, 4.7), gridspec_kw={"width_ratios": [1.3, 1]})
+        _draw_power(axes[0], solver_results)
+        axes[0].set_title("Absolute power: channel variation is shared")
+        _draw_gain_distribution(axes[1], gains)
     else:
-        payload = next(iter(solver_results.values()))
+        fig, ax = plt.subplots(figsize=(8, 4.7))
+        _draw_power(ax, solver_results)
+    fig.suptitle("Communication-detector power", x=.06, ha="left", fontsize=14, fontweight="medium")
+    _legend(fig, solver_results, y=.92)
+    _save(fig, output_dir/"objective_comparison.png", legend=True)
+    fig, ax = plt.subplots(figsize=(9, 4.7))
+    _draw_power(ax, solver_results)
+    fig.suptitle("Collected power · all controllers", x=.07, ha="left", fontsize=14)
+    _legend(fig, solver_results, y=.92)
+    _save(fig, output_dir/"objective_comparison_all.png", legend=True)
+    if gains:
+        fig, (ax, dist) = plt.subplots(1, 2, figsize=(11.2, 4.7), gridspec_kw={"width_ratios": [1.35, 1]})
+        first = next(iter(solver_results.values()))["records"]
+        for name, values in gains.items():
+            ax.plot(_times(first), values, lw=1, color=_color(name), alpha=.85,
+                    marker="o" if len(first) == 1 else None, ms=4)
+        ax.axhline(0, color="#A9ADB2", lw=.8, ls="--")
+        ax.set(xlabel="Time [s]", ylabel="Power change from No control [%]", title="Per interval · no smoothing")
+        _style(ax)
+        names = list(gains)
+        data = [gains[n][np.isfinite(gains[n])] for n in names]
+        boxes = dist.boxplot(data, vert=False, patch_artist=True, widths=.45, showmeans=True,
+            showfliers=False, meanprops=dict(marker="o", markerfacecolor="white", markeredgecolor="#333333", markersize=4),
+            medianprops=dict(color="#333333", linewidth=1.1), whiskerprops=dict(color="#9B9FA5"), capprops=dict(color="#9B9FA5"))
+        for patch, name in zip(boxes["boxes"], names):
+            patch.set(facecolor=_color(name), edgecolor=_color(name), alpha=.65)
+        dist.set_yticks(np.arange(1, len(names)+1), [_label(n) for n in names])
+        dist.invert_yaxis()
+        dist.axvline(0, color="#A9ADB2", lw=.8, ls="--")
+        dist.set(xlabel="Power change [%]", title="Distribution · dot = mean")
+        _style(dist, grid="x")
+        # Keep categorical tick positions after applying the numeric-axis theme.
+        dist.set_yticks(np.arange(1, len(names)+1), [_label(n) for n in names])
+        fig.suptitle("Receiver steering contribution", x=.06, ha="left", fontsize=14)
+        _legend(fig, gains, y=.92)
+        _save(fig, output_dir/"power_gain_comparison.png", legend=True)
+    return output_dir/"objective_comparison.png"
 
-    records = payload["records"]
-    n_intervals = len(records)
 
-    fields = []
-    vmax = 0.0
-    for r in records:
-        U = system.ssfm(
-            np.asarray(r["theta"], dtype=float),
-            int(r["interval"]),
-        )
-        I = np.abs(U) ** 2
-        fields.append(I)
-        vmax = max(vmax, float(np.max(I)))
+def plot_runtime_comparison(output_dir, solver_results):
+    names = list(solver_results)
+    totals, prep, queries = [], [], []
+    for name in names:
+        records = solver_results[name]["records"]
+        totals.append(np.mean([r["runtime_sec"] for r in records])*1e3)
+        prep.append(np.mean([r.get("diagnostics", {}).get("atmosphere_prepare_time_sec", 0) for r in records])*1e3)
+        queries.append(np.mean([r.get("diagnostics", {}).get("query_runtime_sec", 0) for r in records])*1e3)
+    totals, prep, queries = map(np.asarray, (totals, prep, queries))
+    # Older files may have independently sampled clocks; do not draw negative overhead.
+    prep = np.minimum(prep, totals)
+    queries = np.minimum(queries, np.maximum(0, totals-prep))
+    other = np.maximum(0, totals-prep-queries)
+    fig, (ax, parts) = plt.subplots(1, 2, figsize=(11.2, 4.8), gridspec_kw={"width_ratios": [1.35, 1]})
+    y = np.arange(len(names))
+    positive = totals[totals>0]
+    floor = min(positive.min()/3, .01) if len(positive) else .001
+    upper = max(positive.max()*6, 30) if len(positive) else 30
+    for i, (name, value) in enumerate(zip(names, totals)):
+        if value > 0:
+            ax.barh(i, value, color=_color(name), height=.5)
+            label = f"{value:,.0f}" if value >= 100 else f"{value:.3g}"
+            ax.text(value*1.15, i, f"{label} ms", va="center", fontsize=9)
+        else:
+            ax.text(floor*1.3, i, "Held command (0)", va="center", color="#777777", fontsize=9)
+    ax.set_xscale("log")
+    ax.set(xlim=(floor, upper), xlabel="Mean online runtime [ms] · log scale", title="Atmosphere prediction + control")
+    _style(ax, grid="x")
+    ax.set_yticks(y, [_label(n) for n in names]); ax.set_ylim(len(names)-.5, -.5)
+    starts = np.zeros(len(names))
+    for values, label, color in [(prep, "Atmosphere", "#527AA3"), (queries, "Steering queries", "#72A68D"), (other, "Other control", "#C9CDD2")]:
+        width = np.divide(values, totals, out=np.zeros_like(totals), where=totals>0)*100
+        parts.barh(y, width, left=starts, height=.5, label=label, color=color)
+        starts += width
+    parts.set(xlim=(0, 100), xlabel="Fraction of online runtime [%]", title="Where the time goes")
+    _style(parts, grid="x"); parts.set_yticks(y, []); parts.set_ylim(len(names)-.5, -.5)
+    fig.legend(*parts.get_legend_handles_labels(), loc="upper center", bbox_to_anchor=(.72, .9),
+               ncol=3, frameon=False, fontsize=8)
+    fig.suptitle("Runtime breakdown", x=.06, ha="left", fontsize=14)
+    fig.text(.06, .02, "Offline basis setup, simulated sensor acquisition and truth evaluation are excluded.", fontsize=8, color="#666666")
+    return _save(fig, Path(output_dir)/"runtime_comparison.png", legend=True)
 
-    extent = [
-        system.x[0] * 1e3,
-        system.x[-1] * 1e3,
-        system.y[0] * 1e3,
-        system.y[-1] * 1e3,
-    ]
 
-    fig, (ax_im, ax_tr) = plt.subplots(1, 2, figsize=(12.0, 5.4))
+def plot_centroid_trajectories(output_dir, solver_results):
+    names = list(solver_results)
+    cols = min(3, len(names)); rows = int(np.ceil(len(names)/cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(3.5*cols, 3.3*rows), squeeze=False)
+    all_points = [np.asarray([r["actual_centroid"] for r in v["records"]], dtype=float)*1e6 for v in solver_results.values()]
+    finite = np.concatenate(all_points).ravel(); finite = finite[np.isfinite(finite)]
+    half = max(5., np.max(abs(finite))*1.2) if len(finite) else 5.
+    reference = np.asarray(next(iter(solver_results.values()))["records"][0]["target"])*1e6
+    for ax, name, points in zip(axes.flat, names, all_points):
+        ax.scatter(points[:, 0], points[:, 1], s=14, color=_color(name), alpha=.55, linewidths=0)
+        ax.plot(*reference, marker="+", ms=11, mew=1.5, color="#333333")
+        ax.set(title=_label(name), xlabel="PSD x [µm]", ylabel="PSD y [µm]", xlim=(-half, half), ylim=(-half, half))
+        _style(ax, grid="both"); ax.set_aspect("equal")
+    for ax in list(axes.flat)[len(names):]:
+        ax.set_visible(False)
+    fig.suptitle("PSD positions · one point per interval", x=.06, ha="left", fontsize=14)
+    fig.text(.06, .02, "+ Calibrated reference. PSD position is a diagnostic; the objective is communication power.", fontsize=8, color="#666666")
+    return _save(fig, Path(output_dir)/"centroid_trajectories.png")
 
-    im = ax_im.imshow(
-        fields[0],
-        origin="lower",
-        extent=extent,
-        aspect="equal",
-        vmin=0.0,
-        vmax=vmax if vmax > 0 else None,
-    )
-    plt.colorbar(im, ax=ax_im, fraction=0.046, pad=0.04, label="Optical intensity")
-    ax_im.set_xlabel("x [mm]")
-    ax_im.set_ylabel("y [mm]")
-    ax_im.set_title("Actual receiver-plane field: objective=centroid")
 
-    first_target = np.asarray(records[0]["target"], dtype=float) * 1e3
-    roi_radius_mm = system.cfg.optical.centroid_roi_radius * 1e3
-    roi_circle = Circle(
-        (first_target[0], first_target[1]),
-        roi_radius_mm,
-        fill=False,
-        edgecolor="white",
-        linewidth=2.0,
-    )
-    ax_im.add_patch(roi_circle)
+def _view_extent(system):
+    o = system.cfg.optical
+    half = np.ceil(o.detector_view_half_width/o.detector_sampling)*o.detector_sampling
+    return [(o.detector_center[0]-half)*1e6, (o.detector_center[0]+half)*1e6,
+            (o.detector_center[1]-half)*1e6, (o.detector_center[1]+half)*1e6]
 
-    target_im, = ax_im.plot(
-        [first_target[0]], [first_target[1]],
-        marker="+", markersize=14, markeredgewidth=2.5,
-        color="white", linestyle="None", label="target Rx center",
-    )
-    actual_im, = ax_im.plot(
-        [], [], marker="x", markersize=12, markeredgewidth=2.8,
-        color="red", linestyle="None", label="actual beam centroid",
-    )
-    pred_im, = ax_im.plot(
-        [], [], marker="o", markersize=8, markerfacecolor="none",
-        markeredgewidth=2.2, color="cyan", linestyle="None",
-        label="predicted beam centroid",
-    )
-    ax_im.legend(loc="upper right", fontsize=8)
 
-    target_path = np.asarray([r["target"] for r in records], dtype=float) * 1e3
-    ax_tr.plot(
-        target_path[:, 0], target_path[:, 1],
-        linestyle="--", marker=".", label="target",
-    )
-    actual_line, = ax_tr.plot([], [], marker="x", label="actual")
-    pred_line, = ax_tr.plot(
-        [], [], marker="o", markerfacecolor="none", label="Frozen-PINN"
-    )
-    ax_tr.set_xlim(-system.cfg.optical.half_width * 1e3, system.cfg.optical.half_width * 1e3)
-    ax_tr.set_ylim(-system.cfg.optical.half_width * 1e3, system.cfg.optical.half_width * 1e3)
-    ax_tr.set_aspect("equal")
-    ax_tr.set_xlabel("x [mm]")
-    ax_tr.set_ylabel("y [mm]")
-    ax_tr.set_title("Objective-consistent 2D tracking\nbeam centroid")
-    ax_tr.grid(True, alpha=0.3)
-    ax_tr.legend(loc="upper right")
+def _detector_circle(ax, system):
+    o = system.cfg.optical
+    ax.add_patch(Circle(np.asarray(o.detector_center)*1e6, o.aperture_radius*1e6,
+                        fill=False, ec="white", lw=1.2))
+    ax.set(xlabel="Detector x [µm]", ylabel="Detector y [µm]")
+    ax.tick_params(length=2, labelsize=8)
 
-    status = fig.text(0.5, 0.025, "", ha="center")
 
+def _view_limits(system, images):
+    o = system.cfg.optical; extent = _view_extent(system)
+    center = np.asarray(o.detector_center)*1e6; half = 2*o.aperture_radius*1e6
+    for intensity in images:
+        y, x = np.unravel_index(np.argmax(intensity), intensity.shape)
+        peak = [extent[0]+x*(extent[1]-extent[0])/(intensity.shape[1]-1),
+                extent[2]+y*(extent[3]-extent[2])/(intensity.shape[0]-1)]
+        half = max(half, max(abs(np.asarray(peak)-center))+o.aperture_radius*1e6)
+    half = min(half, (extent[1]-extent[0])/2)
+    return (center[0]-half, center[0]+half), (center[1]-half, center[1]+half)
+
+
+def plot_receiver_snapshots(output_dir, solver_results, system, reduced=None):
+    names = list(solver_results)
+    records = next(iter(solver_results.values()))["records"]
+    k = int(records[-1]["interval"])
+    if reduced is None:
+        reduced = system.reduce_field(system.atmospheric_field(k))
+    images = [abs(system.detector_field(reduced, solver_results[n]["records"][-1]["theta"], view=True))**2 for n in names]
+    cols = min(3, len(names)); rows = int(np.ceil(len(names)/cols))
+    fig, axes = plt.subplots(rows, cols, figsize=(3.6*cols, 3.3*rows), squeeze=False, layout="constrained")
+    maximum = max(float(im.max()) for im in images); xlim, ylim = _view_limits(system, images)
+    for ax, name, intensity in zip(axes.flat, names, images):
+        im = ax.imshow(intensity, extent=_view_extent(system), origin="lower", vmin=0, vmax=maximum, cmap="magma")
+        _detector_circle(ax, system); ax.set(xlim=xlim, ylim=ylim)
+        power = solver_results[name]["records"][-1]["communication_power_w"]
+        ax.set_title(f"{_label(name)}\n{power*1e3:.5f} mW", fontsize=10)
+    for ax in list(axes.flat)[len(names):]: ax.set_visible(False)
+    fig.colorbar(im, ax=list(axes.flat)[:len(names)], label="Irradiance [W/m²]", shrink=.8, pad=.025)
+    fig.suptitle(f"Communication detector · interval {k} · circle = active area", fontsize=13)
+    path = Path(output_dir)/"receiver_xy_comparison.png"; fig.savefig(path, dpi=180); plt.close(fig)
+    return path
+
+
+def save_comparison_gif(output_dir, objective, solver_results, fps=8, system=None, frames=None):
+    if system is None: raise ValueError("Receiver XY animation requires the system model")
+    if fps < 1: raise ValueError("GIF fps must be positive")
+    focus = "Frozen-PINN" if "Frozen-PINN" in solver_results else next(iter(solver_results))
+    records = solver_results[focus]["records"]
+    images = frames
+    if images is None:
+        images = []
+        for i, r in enumerate(records):
+            reduced = system.reduce_field(system.atmospheric_field(r["interval"]))
+            images.append((abs(system.detector_field(reduced, r["theta"], view=True))**2).astype(np.float32))
+            if (i+1) % 20 == 0: print(f"GIF fields: {i+1}/{len(records)}", flush=True)
+    if len(images) != len(records): raise ValueError("GIF frame/record count differs")
+    fig = plt.figure(figsize=(11.6, 5.1))
+    grid = fig.add_gridspec(2, 2, width_ratios=[1, 1.4], hspace=.48, wspace=.35)
+    left = fig.add_subplot(grid[:, 0]); power_ax = fig.add_subplot(grid[0, 1]); gain_ax = fig.add_subplot(grid[1, 1])
+    maximum = max(max(float(v.max()) for v in images), 1e-30)
+    # A fixed, labelled logarithmic scale keeps low-power channels visible
+    # without normalizing away the physical power variation between frames.
+    im = left.imshow(images[0], origin="lower", extent=_view_extent(system), cmap="magma",
+                     norm=LogNorm(vmin=maximum*1e-4, vmax=maximum))
+    _detector_circle(left, system); xlim, ylim = _view_limits(system, images); left.set(xlim=xlim, ylim=ylim)
+    fig.colorbar(im, ax=left, fraction=.045, pad=.03, label="Irradiance [W/m²] · log scale")
+    left.set_title(f"{focus} · detector plane", fontsize=11)
+    gains = _gains(solver_results); times = _times(records)
+    lines = {}; gain_lines = {}
+    ymax = max(float(_values(v).max())*1e3 for v in solver_results.values())
+    for name in solver_results:
+        lines[name], = power_ax.plot([], [], lw=1.25, color=_color(name), ls="--" if name=="No control" else "-",
+                                    marker="o", ms=3, markevery=[-1])
+        if name in gains:
+            gain_lines[name], = gain_ax.plot([], [], lw=1.2, color=_color(name), marker="o", ms=3, markevery=[-1])
+    end = times[-1] if len(times)>1 else times[0]+system.cfg.tracking.control_interval_sec
+    power_ax.set(xlim=(times[0], end), ylim=(0, max(ymax*1.08, 1e-9)), ylabel="Power [mW]", title="Actual collected power")
+    if gains:
+        vals = np.concatenate(list(gains.values())); vals = vals[np.isfinite(vals)]
+        low, high = (float(vals.min()), float(vals.max())) if len(vals) else (-1., 1.)
+        pad = max((high-low)*.12, .05)
+        gain_ax.set(ylim=(min(low-pad, 0), max(high+pad, 0)))
+    gain_ax.axhline(0, color="#A9ADB2", lw=.8, ls="--")
+    gain_ax.set(xlim=(times[0], end), xlabel="Time [s]", ylabel="Δpower [%]", title="Relative to No control")
+    _style(power_ax); _style(gain_ax)
+    _legend(fig, solver_results, y=.99)
+    status = fig.text(.5, .025, "", ha="center", fontsize=9, color="#444444")
     def update(frame):
-        r = records[frame]
-        im.set_data(fields[frame])
-
-        target = np.asarray(r["target"], dtype=float)
-        actual = np.asarray(r["actual_centroid"], dtype=float)
-        predicted = np.asarray(
-            r.get("predicted_centroid", r["actual_centroid"]),
-            dtype=float,
-        )
-
-        target_mm = target * 1e3
-        actual_mm = actual * 1e3
-        predicted_mm = predicted * 1e3
-
-        roi_circle.center = (target_mm[0], target_mm[1])
-        target_im.set_data([target_mm[0]], [target_mm[1]])
-        actual_im.set_data([actual_mm[0]], [actual_mm[1]])
-        pred_im.set_data([predicted_mm[0]], [predicted_mm[1]])
-
-        actual_hist = np.asarray(
-            [records[i]["actual_centroid"] for i in range(frame + 1)],
-            dtype=float,
-        ) * 1e3
-        predicted_hist = np.asarray(
-            [records[i].get("predicted_centroid", records[i]["actual_centroid"]) for i in range(frame + 1)],
-            dtype=float,
-        ) * 1e3
-
-        actual_line.set_data(actual_hist[:, 0], actual_hist[:, 1])
-        pred_line.set_data(predicted_hist[:, 0], predicted_hist[:, 1])
-
-        theta = np.asarray(r["theta"], dtype=float)
-        target_error = np.linalg.norm(actual - target) * 1e3
-        model_error = np.linalg.norm(predicted - actual) * 1e3
-        t_sec = float(r.get("time_sec", frame * system.cfg.tracking.control_interval_sec))
-
-        status.set_text(
-            f"t={t_sec:.3f} s   k={frame}   "
-            f"theta=({theta[0]*1e6:+.1f},{theta[1]*1e6:+.1f}) urad   "
-            f"target error={target_error:.3f} mm   "
-            f"prediction-vs-actual centroid error={model_error:.3f} mm"
-        )
-
-        return (
-            im, roi_circle, target_im, actual_im, pred_im,
-            actual_line, pred_line, status,
-        )
-
-    ani = FuncAnimation(
-        fig,
-        update,
-        frames=n_intervals,
-        interval=1000 / max(int(fps), 1),
-        blit=False,
-        repeat=True,
-    )
-    fig.subplots_adjust(left=0.06, right=0.96, bottom=0.14, top=0.90, wspace=0.27)
-
-    path = output_dir / "centroid_tracking.gif"
-    ani.save(path, writer=PillowWriter(fps=max(int(fps), 1)))
-    plt.close(fig)
-
-    return path
-
-
-def save_comparison_gif(output_dir: Path, objective: str, solver_results, fps: int = 3, system=None):
-    output_dir.mkdir(parents=True, exist_ok=True)
-    if objective == "centroid" and system is not None:
-        return save_centroid_tracking_gifs(output_dir, solver_results, system, fps=fps)
-
-    gif_results = _controlled_solver_results(solver_results)
-    n_intervals = max(len(payload["records"]) for payload in gif_results.values())
-
-    fig, ax = plt.subplots(figsize=(7.6, 4.6))
-    ylabel, title = _objective_label(objective)
-    ax.set_xlabel("PAT control interval k")
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-
-    all_values = []
-    for payload in gif_results.values():
-        all_values.extend(float(r["display_metric"]) for r in payload["records"])
-    finite = np.asarray([v for v in all_values if np.isfinite(v)], dtype=float)
-    if finite.size:
-        ymin, ymax = float(np.min(finite)), float(np.max(finite))
-        pad = max(abs(ymax), 1.0) * 0.05 if abs(ymax - ymin) < 1e-15 else 0.10 * (ymax - ymin)
-        ax.set_ylim(ymin - pad, ymax + pad)
-
-    ax.set_xlim(-0.25, max(n_intervals - 1, 1) + 0.25)
-    ax.grid(True, alpha=0.3)
-
-    lines = {}
-    for solver_name in gif_results:
-        line, = ax.plot([], [], marker="o", label=solver_name)
-        lines[solver_name] = line
-    ax.legend(loc="best")
-    status = ax.text(0.02, 0.97, "", transform=ax.transAxes, va="top")
-
-    def update(frame):
-        for solver_name, payload in gif_results.items():
-            records = payload["records"]
-            upto = min(frame + 1, len(records))
-            x = np.arange(upto)
-            y = np.asarray([records[i]["display_metric"] for i in range(upto)], dtype=float)
-            lines[solver_name].set_data(x, y)
-        status.set_text(f"interval {frame + 1}/{n_intervals}")
-        return tuple(lines.values()) + (status,)
-
-    animation = FuncAnimation(
-        fig,
-        update,
-        frames=n_intervals,
-        interval=1000 / max(int(fps), 1),
-        blit=False,
-        repeat=True,
-    )
-    path = output_dir / "comparison.gif"
-    animation.save(path, writer=PillowWriter(fps=max(int(fps), 1)))
+        r = records[frame]; im.set_data(images[frame])
+        for name, payload in solver_results.items():
+            lines[name].set_data(times[:frame+1], _values(payload)[:frame+1]*1e3)
+            if name in gains: gain_lines[name].set_data(times[:frame+1], gains[name][:frame+1])
+        theta = np.asarray(r["theta"])*1e6
+        status.set_text(f"t = {r['time_sec']:.2f} s   |   interval {r['interval']}   |   FSM ({theta[0]:+.0f}, {theta[1]:+.0f}) µrad   |   P = {r['communication_power_w']*1e3:.5f} mW")
+        return (im, status, *lines.values(), *gain_lines.values())
+    fig.subplots_adjust(left=.07, right=.97, top=.84, bottom=.17)
+    animation = FuncAnimation(fig, update, frames=len(records), interval=1000/fps, blit=False)
+    path = Path(output_dir)/"comparison.gif"
+    temporary = path.with_name("comparison.partial.gif")
+    animation.save(temporary, writer=PillowWriter(fps=fps))
+    temporary.replace(path)
     plt.close(fig)
     return path
 
-def _draw_aggregate_curves(ax, objective: str, aggregate_results):
-    values_for_limits = []
 
-    for solver_name, payload in aggregate_results.items():
-        mean = np.asarray(payload["mean_by_interval"], dtype=float)
-        std = np.asarray(payload["std_by_interval"], dtype=float)
-        k = np.arange(len(mean))
-
-        kwargs = {}
-        if _is_no_control(solver_name):
-            kwargs.update(
-                linestyle="--",
-                alpha=0.65,
-                linewidth=1.6,
-            )
-
-        ax.plot(
-            k,
-            mean,
-            marker="o",
-            label=solver_name,
-            **kwargs,
-        )
-        ax.fill_between(
-            k,
-            mean - std,
-            mean + std,
-            alpha=0.16 if not _is_no_control(solver_name) else 0.08,
-        )
-        values_for_limits.extend((mean - std).tolist())
-        values_for_limits.extend((mean + std).tolist())
-
-    ylabel, title = _objective_label(objective)
-    ax.set_xlabel("PAT control interval k")
-    ax.set_ylabel(ylabel)
-    ax.set_title(f"{title} (mean ± std)")
-    ax.grid(True, alpha=0.25)
-    ax.legend()
-    return values_for_limits
-
-
-def plot_aggregate_objective(output_dir: Path, objective: str, aggregate_results):
-    """Mean±std controller-focused graph plus complete all-method graph."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    controlled = _controlled_solver_results(aggregate_results)
-
-    fig, ax = plt.subplots(figsize=(7.8, 4.6))
-    values = _draw_aggregate_curves(ax, objective, controlled)
-    _set_metric_ylim(ax, values, objective)
-    fig.tight_layout()
-    path = output_dir / "aggregate_objective_comparison.png"
-    fig.savefig(path, dpi=190)
-    plt.close(fig)
-
-    fig, ax = plt.subplots(figsize=(7.8, 4.6))
-    _draw_aggregate_curves(ax, objective, aggregate_results)
-    fig.tight_layout()
-    all_path = output_dir / "aggregate_objective_comparison_all.png"
-    fig.savefig(all_path, dpi=190)
-    plt.close(fig)
-
-    return path
-
+def plot_aggregate_objective(output_dir, objective, aggregate_results):
+    for filename, results in [("aggregate_objective_comparison.png", _controlled_solver_results(aggregate_results)),
+                              ("aggregate_objective_comparison_all.png", aggregate_results)]:
+        fig, ax = plt.subplots(figsize=(9, 4.8))
+        for name, payload in results.items():
+            mean = np.asarray(payload["mean_by_interval"])*1e3; std = np.asarray(payload["std_by_interval"])*1e3
+            k = np.arange(len(mean)); ax.plot(k, mean, lw=1.5, color=_color(name))
+            ax.fill_between(k, np.maximum(0, mean-std), mean+std, color=_color(name), alpha=.08)
+        ax.set(xlabel="PAT interval", ylabel="Collected power [mW]"); _style(ax)
+        fig.suptitle("Repeated experiments · mean ± descriptive SD", x=.07, ha="left", fontsize=13)
+        _legend(fig, results, y=.92); _save(fig, Path(output_dir)/filename, legend=True)
+    return Path(output_dir)/"aggregate_objective_comparison.png"

@@ -1,0 +1,1165 @@
+{
+  "created_utc": "2026-09-22T12:15:47.143213+00:00",
+  "config": {
+    "name": "pdf_paper_mps_verified",
+    "preset": "paper",
+    "model_version": "receiver_fsm_pdf_v1",
+    "reference_document": "PAT (1).pdf, Sections II-IV, Tables I-II",
+    "channel_realizations": 100,
+    "feature_seeds": 5,
+    "optical": {
+      "wavelength": 1.55e-06,
+      "transmit_power": 0.01,
+      "beam_waist": 0.05,
+      "propagation_distance": 20000.0,
+      "path_loss_db": 1.0,
+      "half_width": 1.0,
+      "grid_size": 1024,
+      "tx_displacement": [
+        0.0,
+        0.0
+      ],
+      "tx_angular_std": 5e-06,
+      "entrance_diameter": 0.1,
+      "reducer_magnification": 0.1,
+      "reducer_transmission": 0.97,
+      "reducer_phase_curvature": 0.0,
+      "receiver_grid_size": 1024,
+      "receiver_half_width": 0.006,
+      "focal_length": 0.2,
+      "fsm_to_lens": 0.05,
+      "lens_to_splitter": 0.05,
+      "splitter_to_psd": 0.15,
+      "splitter_to_detector": 0.15,
+      "splitter_transmission": 0.62,
+      "splitter_reflection": 0.27,
+      "splitter_phase": 0.0,
+      "fsm_calibration": [
+        [
+          2.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.0
+        ]
+      ],
+      "psd_width": 0.01,
+      "psd_center": [
+        0.0,
+        0.0
+      ],
+      "detector_center": [
+        0.0,
+        0.0
+      ],
+      "aperture_radius": 7.5e-05,
+      "detector_sampling": 2e-06,
+      "detector_view_half_width": 0.00045,
+      "psd_padding": 2,
+      "psd_position_noise_std": 5e-06,
+      "psd_power_noise_std": 0.0,
+      "psd_min_power": 1e-12
+    },
+    "turbulence": {
+      "ground_cn2": 1.7e-14,
+      "hv_wind_speed": 21.0,
+      "outer_scale": 10.0,
+      "inner_scale": 0.005,
+      "strength_scale": 1.0,
+      "num_modes": 128,
+      "layer_thickness": 50.0,
+      "seed": 7
+    },
+    "frozen_pinn": {
+      "backend": "auto",
+      "operator_backend": "auto",
+      "device": "mps",
+      "dtype": "float64",
+      "hidden_width": 1024,
+      "collocation_side": 128,
+      "spectral_side": 48,
+      "feature_scale_max": 80.0,
+      "boundary_envelope_fraction": 0.35,
+      "svd_cutoff": 1e-06,
+      "ode_rtol": 1e-06,
+      "ode_atol": 1e-08,
+      "seed": 7
+    },
+    "baselines": {
+      "ssfm_device": "mps",
+      "ssfm_dtype": "float64",
+      "pid_kp": 0.8,
+      "pid_ki": 8.0,
+      "pid_kd": 0.001,
+      "mpc_rho": 0.15,
+      "oracle_fd_step": 1e-07
+    },
+    "tracking": {
+      "objective": "power",
+      "num_intervals": 3,
+      "control_interval_sec": 0.01,
+      "disturbance": "iid",
+      "target_period_sec": 0.5,
+      "ssfm_steps": 400,
+      "theta_max": 0.001,
+      "theta_slew_rate": 0.01,
+      "theta_slew_max_override": null,
+      "theta_quantization": 1e-06,
+      "initial_theta": [
+        0.0,
+        0.0
+      ],
+      "max_opt_iterations": 20,
+      "optimizer_step": 5e-05,
+      "line_search_shrink": 0.5,
+      "line_search_steps": 10,
+      "optimizer_min_step": 1e-09,
+      "gradient_norm_tol": 1e-12,
+      "objective_rel_tol": 1e-06,
+      "objective_abs_tol": 1e-12,
+      "control_regularization": 0.0
+    }
+  },
+  "metadata": {
+    "objective": "P_D,k: communication-detector collected power [W]",
+    "calibration": {
+      "reference_centroid_m": [
+        0.0,
+        0.0
+      ],
+      "jacobian_m_per_rad": [
+        [
+          0.4,
+          0.0
+        ],
+        [
+          0.0,
+          0.4
+        ]
+      ],
+      "source": "ideal aligned back-focal-plane calibration; replace with measurements for hardware"
+    },
+    "runtime_scope": "controller atmospheric prediction + receiver queries + command selection; excludes simulated PSD acquisition, plant truth and plotting",
+    "offline_basis_setup_excluded": true,
+    "offline_operator_setup_excluded": true,
+    "discretization": {
+      "ssfm_grid_shape": [
+        1024,
+        1024
+      ],
+      "pinn_feature_count": 1024,
+      "pinn_collocation_shape": [
+        128,
+        128
+      ]
+    },
+    "atmosphere": "HV profile, finite random Fourier modified-von-Karman Markov layers",
+    "resolution_status": "Table II nominal setting; convergence still requires validation"
+  },
+  "solvers": {
+    "Frozen-PINN": {
+      "records": [
+        {
+          "interval": 0,
+          "time_sec": 0.0,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            9e-06,
+            -1.4999999999999999e-05
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            8.963263497680229e-06,
+            -8.359806375576878e-06
+          ],
+          "objective_value": 3.1920576173387436e-05,
+          "display_metric": 3.1920576173387436e-05,
+          "communication_power_w": 3.1920576173387436e-05,
+          "actual_centroid": [
+            1.1523405798969083e-05,
+            -1.696571170519703e-05
+          ],
+          "psd_power_w": 1.569377379753046e-05,
+          "psd_measurement": [
+            1.7848374717856276e-06,
+            -7.283215441631048e-06,
+            1.569377365043821e-05
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 20.50912613622467,
+          "runtime_sec": 4.827744000001985,
+          "predicted_metric": 4.0700655517866835e-05,
+          "diagnostics": {
+            "optimizer_iterations": 5,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 9.30498172287418e-05,
+            "final_numerical_step_norm": 1.9531250000000054e-07,
+            "continuous_command": [
+              8.56223186295772e-06,
+              -1.522518735394177e-05
+            ],
+            "continuous_power_trace_w": [
+              4.059388811583631e-05,
+              4.060319042764604e-05,
+              4.068941416335292e-05,
+              4.070058275829069e-05,
+              4.070069553563371e-05,
+              4.070070281159133e-05
+            ],
+            "physical_command_change_norm": 1.74928556845359e-05,
+            "physical_command_change_by_axis": [
+              9e-06,
+              1.4999999999999999e-05
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "basis_rank": 710,
+            "boundary_residual": 0.0,
+            "basis_setup_time_sec": 0.5051066249943688,
+            "initial_field_relative_error": 0.1998614155493013,
+            "coefficient_power_ratio": 0.7943045373420182,
+            "expected_extinction_ratio": 0.7943282347242815,
+            "atmosphere_prepare_time_sec": 4.6317953329999,
+            "atmosphere_integrations_this_interval": 1,
+            "ode_nfev": 10862,
+            "atmosphere_backend": "mps_projected_scipy_cpu_RK45",
+            "operator_dtype": "float32",
+            "ode_dtype": "complex128",
+            "operator_setup_time_sec": 0.21231450000050245,
+            "coefficient_evolution_time_sec": 4.61849845800316,
+            "operator_assembly_time_sec": 4.161127784958808,
+            "ode_integration_time_sec": 0.39787545496074017,
+            "channel_sampling_time_sec": 0.0592600849995506,
+            "ode_solver": "scipy_RK45",
+            "boundary_transform": "fixed_Dirichlet_sine_projection",
+            "atmosphere_depends_on_fsm": false,
+            "predicted_centroid": [
+              8.084888706076592e-06,
+              -9.225940439392997e-06
+            ],
+            "initial_command": [
+              -4.462093679464069e-06,
+              1.820803860407762e-05
+            ],
+            "sensing_valid": true,
+            "query_runtime_sec": 0.10716570800286718,
+            "gradient_backend": "torch_receiver_autograd",
+            "device": "mps",
+            "effective_dtype": "float32",
+            "requested_dtype": "float64",
+            "receiver_complex_backend": "real_pair",
+            "receiver_field_relative_error": 0.4765265632744733,
+            "receiver_intensity_relative_error": 0.5614156014027457,
+            "power_prediction_relative_error": 0.27506017738487615
+          },
+          "predicted_centroid": [
+            8.084888706076592e-06,
+            -9.225940439392997e-06
+          ]
+        },
+        {
+          "interval": 1,
+          "time_sec": 0.01,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -7e-06,
+            -1.9999999999999998e-05
+          ],
+          "theta_previous": [
+            9e-06,
+            -1.4999999999999999e-05
+          ],
+          "tx_angular_error": [
+            -6.49265709287479e-06,
+            -5.202111860952888e-09
+          ],
+          "objective_value": 0.00023389541491831574,
+          "display_metric": 0.00023389541491831574,
+          "communication_power_w": 0.00023389541491831574,
+          "actual_centroid": [
+            -1.3109849464962534e-06,
+            -1.3954617594662362e-05
+          ],
+          "psd_power_w": 0.00011198075854254327,
+          "psd_measurement": [
+            7.068632042641359e-06,
+            -9.625294551934554e-06,
+            0.00011198075889796894
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 14.016063418206988,
+          "runtime_sec": 4.979422415999579,
+          "predicted_metric": 0.0002329391281818971,
+          "diagnostics": {
+            "optimizer_iterations": 8,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 0.001409152735435578,
+            "final_numerical_step_norm": 3.9062500000000007e-07,
+            "continuous_command": [
+              -6.5769575101255685e-06,
+              -2.0187475463330964e-05
+            ],
+            "continuous_power_trace_w": [
+              0.00023225447512231767,
+              0.0002328363189008087,
+              0.0002328630507690832,
+              0.0002328996197320521,
+              0.0002329050184926018,
+              0.0002329167036805302,
+              0.0002329352282686159,
+              0.00023293904087040573,
+              0.00023293925914913416
+            ],
+            "physical_command_change_norm": 1.6763054614240212e-05,
+            "physical_command_change_by_axis": [
+              1.6e-05,
+              4.9999999999999996e-06
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "basis_rank": 710,
+            "boundary_residual": 0.0,
+            "basis_setup_time_sec": 0.5051066249943688,
+            "initial_field_relative_error": 0.08054300388633678,
+            "coefficient_power_ratio": 0.7943040492547389,
+            "expected_extinction_ratio": 0.7943282347242815,
+            "atmosphere_prepare_time_sec": 4.783007915997587,
+            "atmosphere_integrations_this_interval": 1,
+            "ode_nfev": 10838,
+            "atmosphere_backend": "mps_projected_scipy_cpu_RK45",
+            "operator_dtype": "float32",
+            "ode_dtype": "complex128",
+            "operator_setup_time_sec": 0.21231450000050245,
+            "coefficient_evolution_time_sec": 4.767809707998822,
+            "operator_assembly_time_sec": 4.250443532051577,
+            "ode_integration_time_sec": 0.4316518020350486,
+            "channel_sampling_time_sec": 0.0853361170302378,
+            "ode_solver": "scipy_RK45",
+            "boundary_transform": "fixed_Dirichlet_sine_projection",
+            "atmosphere_depends_on_fsm": false,
+            "predicted_centroid": [
+              -1.6062301332469845e-06,
+              -1.4400685456681391e-05
+            ],
+            "initial_command": [
+              -8.6715801066034e-06,
+              9.063236379836384e-06
+            ],
+            "sensing_valid": true,
+            "query_runtime_sec": 0.10237866699753795,
+            "gradient_backend": "torch_receiver_autograd",
+            "device": "mps",
+            "effective_dtype": "float32",
+            "requested_dtype": "float64",
+            "receiver_complex_backend": "real_pair",
+            "receiver_field_relative_error": 0.17953402146804961,
+            "receiver_intensity_relative_error": 0.24151244236853311,
+            "power_prediction_relative_error": 0.004088522798758594
+          },
+          "predicted_centroid": [
+            -1.6062301332469845e-06,
+            -1.4400685456681391e-05
+          ]
+        },
+        {
+          "interval": 2,
+          "time_sec": 0.02,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            4.4999999999999996e-05,
+            -2e-06
+          ],
+          "theta_previous": [
+            -7e-06,
+            -1.9999999999999998e-05
+          ],
+          "tx_angular_error": [
+            -1.965652644620239e-07,
+            3.3467459869215196e-06
+          ],
+          "objective_value": 0.00047210669569567346,
+          "display_metric": 0.00047210669569567346,
+          "communication_power_w": 0.00047210669569567346,
+          "actual_centroid": [
+            1.3030187407652994e-05,
+            -4.195027661694345e-06
+          ],
+          "psd_power_w": 0.00022524576464081863,
+          "psd_measurement": [
+            -1.468734347601959e-05,
+            -1.3739065320848441e-05,
+            0.00022524576944223289
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 13.688829057335013,
+          "runtime_sec": 4.874340875001508,
+          "predicted_metric": 0.00047301591257564723,
+          "diagnostics": {
+            "optimizer_iterations": 15,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 0.001972132213148097,
+            "final_numerical_step_norm": 3.9062499999999885e-07,
+            "continuous_command": [
+              4.520644318891602e-05,
+              -2.358195581140687e-06
+            ],
+            "continuous_power_trace_w": [
+              0.0004721005097962916,
+              0.0004723556339740753,
+              0.00047281719162128866,
+              0.00047283581807278097,
+              0.0004728724015876651,
+              0.0004728999629151076,
+              0.00047292461385950446,
+              0.0004729428037535399,
+              0.0004729523789137602,
+              0.00047296134289354086,
+              0.00047296282718889415,
+              0.00047296780394390225,
+              0.0004730133805423975,
+              0.00047301428276114166,
+              0.0004730159416794777,
+              0.0004730160580947995
+            ],
+            "physical_command_change_norm": 5.5027265968790415e-05,
+            "physical_command_change_by_axis": [
+              5.2e-05,
+              1.7999999999999997e-05
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "basis_rank": 710,
+            "boundary_residual": 0.0,
+            "basis_setup_time_sec": 0.5051066249943688,
+            "initial_field_relative_error": 0.032441769475092204,
+            "coefficient_power_ratio": 0.7942966128856446,
+            "expected_extinction_ratio": 0.7943282347242815,
+            "atmosphere_prepare_time_sec": 4.594578415999422,
+            "atmosphere_integrations_this_interval": 1,
+            "ode_nfev": 10844,
+            "atmosphere_backend": "mps_projected_scipy_cpu_RK45",
+            "operator_dtype": "float32",
+            "ode_dtype": "complex128",
+            "operator_setup_time_sec": 0.21231450000050245,
+            "coefficient_evolution_time_sec": 4.580305249997764,
+            "operator_assembly_time_sec": 4.118077995917702,
+            "ode_integration_time_sec": 0.3911588680057321,
+            "channel_sampling_time_sec": 0.0708806700349669,
+            "ode_solver": "scipy_RK45",
+            "boundary_transform": "fixed_Dirichlet_sine_projection",
+            "atmosphere_depends_on_fsm": false,
+            "predicted_centroid": [
+              1.335175883120138e-05,
+              -4.146374574798053e-06
+            ],
+            "initial_command": [
+              2.971835869004898e-05,
+              1.4347663302121104e-05
+            ],
+            "sensing_valid": true,
+            "query_runtime_sec": 0.18819408399576787,
+            "gradient_backend": "torch_receiver_autograd",
+            "device": "mps",
+            "effective_dtype": "float32",
+            "requested_dtype": "float64",
+            "receiver_complex_backend": "real_pair",
+            "receiver_field_relative_error": 0.10106992117346915,
+            "receiver_intensity_relative_error": 0.10842084580832513,
+            "power_prediction_relative_error": 0.001925871605430212
+          },
+          "predicted_centroid": [
+            1.335175883120138e-05,
+            -4.146374574798053e-06
+          ]
+        }
+      ],
+      "summary": {
+        "mean_objective": 0.00024597422892912553,
+        "min_objective": 3.1920576173387436e-05,
+        "max_objective": 0.00047210669569567346,
+        "mean_power_w": 0.00024597422892912553,
+        "mean_runtime_sec": 4.893835763667691,
+        "total_runtime_sec": 14.681507291003072,
+        "mean_psd_error_um": 16.071339537255557,
+        "mean_power_prediction_relative_error": 0.09369152392968833,
+        "max_power_prediction_relative_error": 0.27506017738487615
+      }
+    },
+    "PID": {
+      "records": [
+        {
+          "interval": 0,
+          "time_sec": 0.0,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -4e-06,
+            1.8e-05
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            8.963263497680229e-06,
+            -8.359806375576878e-06
+          ],
+          "objective_value": 3.2097224666804476e-05,
+          "display_metric": 3.2097224666804476e-05,
+          "communication_power_w": 3.2097224666804476e-05,
+          "actual_centroid": [
+            6.32807418884853e-06,
+            -3.7758796592976467e-06
+          ],
+          "psd_power_w": 1.5693773088810312e-05,
+          "psd_measurement": [
+            1.7848374717856276e-06,
+            -7.283215441631048e-06,
+            1.569377365043821e-05
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 7.368974836506683,
+          "runtime_sec": 0.00011304099461995065,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        },
+        {
+          "interval": 1,
+          "time_sec": 0.01,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -8e-06,
+            9e-06
+          ],
+          "theta_previous": [
+            -4e-06,
+            1.8e-05
+          ],
+          "tx_angular_error": [
+            -6.49265709287479e-06,
+            -5.202111860952888e-09
+          ],
+          "objective_value": 0.00023308677011358046,
+          "display_metric": 0.00023308677011358046,
+          "communication_power_w": 0.00023308677011358046,
+          "actual_centroid": [
+            -1.7108008498736224e-06,
+            -2.361358553065794e-06
+          ],
+          "psd_power_w": 0.0001119807569649447,
+          "psd_measurement": [
+            1.8720702447024818e-06,
+            3.5669884053685043e-06,
+            0.00011198075877242984
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 2.9159653228502718,
+          "runtime_sec": 9.72500056377612e-05,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        },
+        {
+          "interval": 2,
+          "time_sec": 0.02,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            2.9e-05,
+            1.6e-05
+          ],
+          "theta_previous": [
+            -8e-06,
+            9e-06
+          ],
+          "tx_angular_error": [
+            -1.965652644620239e-07,
+            3.3467459869215196e-06
+          ],
+          "objective_value": 0.0004709004658947035,
+          "display_metric": 0.0004709004658947035,
+          "communication_power_w": 0.0004709004658947035,
+          "actual_centroid": [
+            6.634101860637934e-06,
+            3.0004320520471267e-06
+          ],
+          "psd_power_w": 0.00022524575374322384,
+          "psd_measurement": [
+            -1.5086966537347481e-05,
+            -2.146143288121664e-06,
+            0.00022524576165819146
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 7.281064482359117,
+          "runtime_sec": 8.808299753582105e-05,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        }
+      ],
+      "summary": {
+        "mean_objective": 0.00024536148689169616,
+        "min_objective": 3.2097224666804476e-05,
+        "max_objective": 0.0004709004658947035,
+        "mean_power_w": 0.00024536148689169616,
+        "mean_runtime_sec": 9.945799926451097e-05,
+        "total_runtime_sec": 0.0002983739977935329,
+        "mean_psd_error_um": 5.855334880572023
+      }
+    },
+    "Linear MPC": {
+      "records": [
+        {
+          "interval": 0,
+          "time_sec": 0.0,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -4e-06,
+            1.6e-05
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            8.963263497680229e-06,
+            -8.359806375576878e-06
+          ],
+          "objective_value": 3.209154638710378e-05,
+          "display_metric": 3.209154638710378e-05,
+          "communication_power_w": 3.209154638710378e-05,
+          "actual_centroid": [
+            6.328014540300082e-06,
+            -4.575258207556166e-06
+          ],
+          "psd_power_w": 1.569377314212836e-05,
+          "psd_measurement": [
+            1.7848374717856276e-06,
+            -7.283215441631048e-06,
+            1.569377365043821e-05
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 7.808761469532752,
+          "runtime_sec": 8.774999878369272e-05,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        },
+        {
+          "interval": 1,
+          "time_sec": 0.01,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -8e-06,
+            9.999999999999999e-06
+          ],
+          "theta_previous": [
+            -4e-06,
+            1.6e-05
+          ],
+          "tx_angular_error": [
+            -6.49265709287479e-06,
+            -5.202111860952888e-09
+          ],
+          "objective_value": 0.00023307862941067636,
+          "display_metric": 0.00023307862941067636,
+          "communication_power_w": 0.00023307862941067636,
+          "actual_centroid": [
+            -1.7108040378325429e-06,
+            -1.961596723069847e-06
+          ],
+          "psd_power_w": 0.00011198075713563763,
+          "psd_measurement": [
+            1.8720765924583995e-06,
+            2.7674589031662733e-06,
+            0.00011198075830025348
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 2.6028277238078004,
+          "runtime_sec": 9.92499990388751e-05,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        },
+        {
+          "interval": 2,
+          "time_sec": 0.02,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            2.4999999999999998e-05,
+            1.4e-05
+          ],
+          "theta_previous": [
+            -8e-06,
+            9.999999999999999e-06
+          ],
+          "tx_angular_error": [
+            -1.965652644620239e-07,
+            3.3467459869215196e-06
+          ],
+          "objective_value": 0.0004704629186219134,
+          "display_metric": 0.0004704629186219134,
+          "communication_power_w": 0.0004704629186219134,
+          "actual_centroid": [
+            5.0350929580982486e-06,
+            2.200944012818869e-06
+          ],
+          "psd_power_w": 0.0002252457525058705,
+          "psd_measurement": [
+            -1.5086961709741292e-05,
+            -1.7463976990099894e-06,
+            0.00022524576144109646
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 5.495117436802766,
+          "runtime_sec": 7.545799599029124e-05,
+          "predicted_metric": null,
+          "diagnostics": {
+            "sensing_valid": true
+          }
+        }
+      ],
+      "summary": {
+        "mean_objective": 0.00024521103147323115,
+        "min_objective": 3.209154638710378e-05,
+        "max_objective": 0.0004704629186219134,
+        "mean_power_w": 0.00024521103147323115,
+        "mean_runtime_sec": 8.748599793761969e-05,
+        "total_runtime_sec": 0.00026245799381285906,
+        "mean_psd_error_um": 5.302235543381106
+      }
+    },
+    "Diff-SSFM oracle": {
+      "records": [
+        {
+          "interval": 0,
+          "time_sec": 0.0,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -1.8e-05,
+            5.4999999999999995e-05
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            8.963263497680229e-06,
+            -8.359806375576878e-06
+          ],
+          "objective_value": 3.2262166204440764e-05,
+          "display_metric": 3.2262166204440764e-05,
+          "communication_power_w": 3.2262166204440764e-05,
+          "actual_centroid": [
+            7.332755992033312e-07,
+            1.1012514746353374e-05
+          ],
+          "psd_power_w": 1.5693773305039232e-05,
+          "psd_measurement": [
+            1.7848374717856276e-06,
+            -7.283215441631048e-06,
+            1.569377365043821e-05
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 11.036900567778869,
+          "runtime_sec": 18.13857270799781,
+          "predicted_metric": 3.226217086194083e-05,
+          "diagnostics": {
+            "optimizer_iterations": 8,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 0.00016587897994914256,
+            "final_numerical_step_norm": 3.906249999999981e-07,
+            "continuous_command": [
+              -1.755305642890777e-05,
+              5.5041139885921745e-05
+            ],
+            "continuous_power_trace_w": [
+              3.2096544600790367e-05,
+              3.217265475541353e-05,
+              3.222512168576941e-05,
+              3.224070314900018e-05,
+              3.225197724532336e-05,
+              3.226094850106165e-05,
+              3.22614359902218e-05,
+              3.226213812013157e-05,
+              3.2262167223962024e-05
+            ],
+            "physical_command_change_norm": 5.787054518492114e-05,
+            "physical_command_change_by_axis": [
+              1.8e-05,
+              5.4999999999999995e-05
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "device": "mps",
+            "requested_dtype": "float64",
+            "effective_dtype": "float32",
+            "receiver_complex_backend": "real_pair",
+            "atmosphere_prepare_time_sec": 18.035703041001398,
+            "atmosphere_integrations_this_interval": 1,
+            "atmosphere_depends_on_fsm": false,
+            "atmosphere_backend": "numpy_cpu_ssfm",
+            "gradient_backend": "torch_receiver_autograd",
+            "initial_command": [
+              -4.462093679464069e-06,
+              1.820803860407762e-05
+            ],
+            "query_runtime_sec": 0.10266266600228846
+          }
+        },
+        {
+          "interval": 1,
+          "time_sec": 0.01,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            -4.1e-05,
+            2.8e-05
+          ],
+          "theta_previous": [
+            -1.8e-05,
+            5.4999999999999995e-05
+          ],
+          "tx_angular_error": [
+            -6.49265709287479e-06,
+            -5.202111860952888e-09
+          ],
+          "objective_value": 0.00023482296346265312,
+          "display_metric": 0.00023482296346265312,
+          "communication_power_w": 0.00023482296346265312,
+          "actual_centroid": [
+            -1.4902162365234194e-05,
+            5.234294592016798e-06
+          ],
+          "psd_power_w": 0.00011198076555276816,
+          "psd_measurement": [
+            -3.724209741863928e-06,
+            1.8358736340250014e-05,
+            0.00011198075957484537
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 15.794691609392656,
+          "runtime_sec": 18.59452616699855,
+          "predicted_metric": 0.00023482300457544625,
+          "diagnostics": {
+            "optimizer_iterations": 6,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 0.0006297177319448689,
+            "final_numerical_step_norm": 1.9531249999999863e-07,
+            "continuous_command": [
+              -4.096049443527027e-05,
+              2.8386359549861823e-05
+            ],
+            "continuous_power_trace_w": [
+              0.0002331099967705086,
+              0.00023319282627198845,
+              0.00023361558851320297,
+              0.00023477493959944695,
+              0.00023482168035116047,
+              0.0002348232374060899,
+              0.00023482326650992036
+            ],
+            "physical_command_change_norm": 3.546829570193639e-05,
+            "physical_command_change_by_axis": [
+              2.3e-05,
+              2.6999999999999996e-05
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "device": "mps",
+            "requested_dtype": "float64",
+            "effective_dtype": "float32",
+            "receiver_complex_backend": "real_pair",
+            "atmosphere_prepare_time_sec": 18.503314624998893,
+            "atmosphere_integrations_this_interval": 1,
+            "atmosphere_depends_on_fsm": false,
+            "atmosphere_backend": "numpy_cpu_ssfm",
+            "gradient_backend": "torch_receiver_autograd",
+            "initial_command": [
+              -8.689475645340181e-06,
+              9.103159149374964e-06
+            ],
+            "query_runtime_sec": 0.09104245899652597
+          }
+        },
+        {
+          "interval": 2,
+          "time_sec": 0.02,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            4.9e-05,
+            4e-06
+          ],
+          "theta_previous": [
+            -4.1e-05,
+            2.8e-05
+          ],
+          "tx_angular_error": [
+            -1.965652644620239e-07,
+            3.3467459869215196e-06
+          ],
+          "objective_value": 0.0004721999043225877,
+          "display_metric": 0.0004721999043225877,
+          "communication_power_w": 0.0004721999043225877,
+          "actual_centroid": [
+            1.4629298790334617e-05,
+            -1.7965294214826944e-06
+          ],
+          "psd_power_w": 0.00022524576305966708,
+          "psd_measurement": [
+            -2.8279250884243845e-05,
+            5.449068564240436e-06,
+            0.00022524575460131264
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 14.739196079133315,
+          "runtime_sec": 18.73897454199323,
+          "predicted_metric": 0.0004721999284811318,
+          "diagnostics": {
+            "optimizer_iterations": 12,
+            "optimizer_stop_reason": "objective_tol",
+            "final_gradient_norm": 0.0014319438877321477,
+            "final_numerical_step_norm": 3.906250000000013e-07,
+            "continuous_command": [
+              4.906310189448462e-05,
+              3.7367176826862887e-06
+            ],
+            "continuous_power_trace_w": [
+              0.00047090434236451983,
+              0.0004716602270491421,
+              0.0004719574353657663,
+              0.0004720735887531191,
+              0.000472097541205585,
+              0.00047212420031428337,
+              0.0004721310397144407,
+              0.0004721430304925889,
+              0.0004721945442724973,
+              0.0004721982986666262,
+              0.00047219949192367494,
+              0.000472200132207945,
+              0.00047220030683092773
+            ],
+            "physical_command_change_norm": 9.314504817756013e-05,
+            "physical_command_change_by_axis": [
+              8.999999999999999e-05,
+              2.4e-05
+            ],
+            "theta_slew_max": [
+              0.0001,
+              0.0001
+            ],
+            "theta_quantization": 1e-06,
+            "device": "mps",
+            "requested_dtype": "float64",
+            "effective_dtype": "float32",
+            "receiver_complex_backend": "real_pair",
+            "atmosphere_prepare_time_sec": 18.556901333002315,
+            "atmosphere_integrations_this_interval": 1,
+            "atmosphere_depends_on_fsm": false,
+            "atmosphere_backend": "numpy_cpu_ssfm",
+            "gradient_backend": "torch_receiver_autograd",
+            "initial_command": [
+              2.969812721060962e-05,
+              1.437732858939891e-05
+            ],
+            "query_runtime_sec": 0.18195225000090431
+          }
+        }
+      ],
+      "summary": {
+        "mean_objective": 0.0002464283446632272,
+        "min_objective": 3.2262166204440764e-05,
+        "max_objective": 0.0004721999043225877,
+        "mean_power_w": 0.0002464283446632272,
+        "mean_runtime_sec": 18.490691138996528,
+        "total_runtime_sec": 55.47207341698959,
+        "mean_psd_error_um": 13.85692941876828
+      }
+    },
+    "No control": {
+      "records": [
+        {
+          "interval": 0,
+          "time_sec": 0.0,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            0.0,
+            0.0
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            8.963263497680229e-06,
+            -8.359806375576878e-06
+          ],
+          "objective_value": 3.2062575449784583e-05,
+          "display_metric": 3.2062575449784583e-05,
+          "communication_power_w": 3.2062575449784583e-05,
+          "actual_centroid": [
+            7.926385937757338e-06,
+            -1.0970306020140103e-05
+          ],
+          "psd_power_w": 1.569377365043821e-05,
+          "psd_measurement": [
+            1.7848374717856276e-06,
+            -7.283215441631048e-06,
+            1.569377365043821e-05
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 13.534223590948963,
+          "runtime_sec": 0.0,
+          "predicted_metric": null,
+          "diagnostics": {}
+        },
+        {
+          "interval": 1,
+          "time_sec": 0.01,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            0.0,
+            0.0
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            -6.49265709287479e-06,
+            -5.202111860952888e-09
+          ],
+          "objective_value": 0.00023311909579598706,
+          "display_metric": 0.00023311909579598706,
+          "communication_power_w": 0.00023311909579598706,
+          "actual_centroid": [
+            1.4870257743530948e-06,
+            -5.959239859404327e-06
+          ],
+          "psd_power_w": 0.00011198075622836055,
+          "psd_measurement": [
+            3.4710274668474664e-06,
+            -3.6287497255416534e-06,
+            0.00011198075622836055
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 6.1419691757207415,
+          "runtime_sec": 0.0,
+          "predicted_metric": null,
+          "diagnostics": {}
+        },
+        {
+          "interval": 2,
+          "time_sec": 0.02,
+          "target": [
+            0.0,
+            0.0
+          ],
+          "theta": [
+            0.0,
+            0.0
+          ],
+          "theta_previous": [
+            0.0,
+            0.0
+          ],
+          "tx_angular_error": [
+            -1.965652644620239e-07,
+            3.3467459869215196e-06
+          ],
+          "objective_value": 0.0004699906502697469,
+          "display_metric": 0.0004699906502697469,
+          "communication_power_w": 0.0004699906502697469,
+          "actual_centroid": [
+            -4.958633504655044e-06,
+            -3.395499782989762e-06
+          ],
+          "psd_power_w": 0.00022524576082660962,
+          "psd_measurement": [
+            -1.1888950380035871e-05,
+            -5.743879384848264e-06,
+            0.00022524576082660962
+          ],
+          "psd_measurement_valid": true,
+          "psd_error_um": 6.00978077884469,
+          "runtime_sec": 0.0,
+          "predicted_metric": null,
+          "diagnostics": {}
+        }
+      ],
+      "summary": {
+        "mean_objective": 0.00024505744050517283,
+        "min_objective": 3.2062575449784583e-05,
+        "max_objective": 0.0004699906502697469,
+        "mean_power_w": 0.00024505744050517283,
+        "mean_runtime_sec": 0.0,
+        "total_runtime_sec": 0.0,
+        "mean_psd_error_um": 8.561991181838131
+      }
+    }
+  }
+}

@@ -1,343 +1,177 @@
-from __future__ import annotations
+"""Frozen tanh features and one atmospheric coefficient evolution per interval.
 
+A_boundary is a fixed Gaussian window followed by a Dirichlet sine projection.
+It is linear, satisfies the boundary everywhere (not just at sampled points),
+and has an analytic Laplacian. SVD whitening only changes coefficient units.
+The matrix-free RHS is exactly the collocation least-squares G(z)c, Eq. (35).
+"""
+from __future__ import annotations
 import time
 import numpy as np
+from scipy.fft import dstn, idstn
 from scipy.integrate import solve_ivp
-
-from config.settings import ExperimentConfig
-from system_model.optical_system import OpticalPATSystem
-from solver.optimization import projected_gradient_ascent
+from solver.optimization import projected_gradient_ascent, sensing_initial_command
 
 
 class FrozenPINNBasis:
-    """Frozen-PINN spatial neural representation."""
+    def __init__(self, system, cfg):
+        self.system, self.cfg = system, cfg
+        o, f = cfg.optical, cfg.frozen_pinn
+        self.n, self.s = f.collocation_side, f.spectral_side
+        self.H = o.half_width
+        self.axis = -self.H + 2 * self.H * np.arange(1, self.n + 1) / (self.n + 1)
+        self.X, self.Y = np.meshgrid(self.axis, self.axis)
+        self.xc, self.yc = self.X.ravel(), self.Y.ravel()
+        rng = np.random.default_rng(f.seed + 1234)
+        direction = rng.normal(size=(f.hidden_width, 2))
+        direction /= np.linalg.norm(direction, axis=1, keepdims=True)
+        scales = np.exp(rng.uniform(np.log(5.0), np.log(f.feature_scale_max), f.hidden_width))
+        self.W = direction * scales[:, None]
+        # Multi-scale ridge locations are an explicit implementation choice;
+        # the PDF does not prescribe a distribution for w_m or b_m.
+        self.b = rng.uniform(-2.0, 2.0, f.hidden_width)
+        modal_features = np.empty((self.s**2, f.hidden_width))
+        for start in range(0, f.hidden_width, 32):
+            stop = min(start + 32, f.hidden_width)
+            raw = np.tanh(self.W[start:stop, 0, None, None] * self.X / self.H
+                          + self.W[start:stop, 1, None, None] * self.Y / self.H
+                          + self.b[start:stop, None, None])
+            raw *= np.exp(-(self.X**2 + self.Y**2) / (f.boundary_envelope_fraction * self.H)**2)
+            modal = dstn(raw, type=1, axes=(-2, -1), norm="ortho") * (2 * self.H / (self.n + 1))
+            modal_features[:, start:stop] = modal[:, :self.s, :self.s].reshape(stop - start, -1).T
+        Q, singular, _ = np.linalg.svd(modal_features, full_matrices=False)
+        keep = singular > f.svd_cutoff * singular[0]
+        self.Q = Q[:, keep].copy()
+        self.singular_values = singular
+        self.R = self.Q.shape[1]
+        modes = np.arange(1, self.s + 1) * np.pi / (2 * self.H)
+        self.lap_eigenvalues = -(modes[:, None]**2 + modes[None, :]**2).ravel()
+        self.laplacian = self.Q.T @ (self.lap_eigenvalues[:, None] * self.Q)
+        self.boundary_residual = 0.0
 
-    def __init__(self, system: OpticalPATSystem, cfg: ExperimentConfig):
-        self.system = system
-        self.cfg = cfg
-        oc = cfg.optical
-        fc = cfg.frozen_pinn
+    def to_modal(self, field):
+        modes = dstn(np.asarray(field).reshape(self.n, self.n), type=1, norm="ortho")
+        return (modes[:self.s, :self.s] * (2 * self.H / (self.n + 1))).ravel()
 
-        xc = np.linspace(-oc.half_width, oc.half_width, fc.collocation_side)
-        yc = np.linspace(-oc.half_width, oc.half_width, fc.collocation_side)
-        Xc, Yc = np.meshgrid(xc, yc, indexing="xy")
-        self.xc = Xc.ravel()
-        self.yc = Yc.ravel()
-        self.xy_phys = np.column_stack([self.xc, self.yc])
-        self.xy = self.xy_phys / oc.half_width
+    def from_modal(self, modes):
+        padded = np.zeros((self.n, self.n), dtype=np.asarray(modes).dtype)
+        padded[:self.s, :self.s] = np.asarray(modes).reshape(self.s, self.s)
+        return idstn(padded, type=1, norm="ortho") * ((self.n + 1) / (2 * self.H))
 
-        xb = np.linspace(-oc.half_width, oc.half_width, fc.boundary_side)
-        yb = np.linspace(-oc.half_width, oc.half_width, fc.boundary_side)
-        boundary_xy = np.vstack([
-            np.column_stack([xb, np.full_like(xb, -oc.half_width)]),
-            np.column_stack([xb, np.full_like(xb,  oc.half_width)]),
-            np.column_stack([np.full_like(yb, -oc.half_width), yb]),
-            np.column_stack([np.full_like(yb,  oc.half_width), yb]),
-        ])
-        self.xy_boundary_phys = np.unique(boundary_xy, axis=0)
-        self.xy_boundary = self.xy_boundary_phys / oc.half_width
+    def initial_coefficients(self, values):
+        return self._multiply(self.Q.T, self.to_modal(values))
 
-        rng = np.random.default_rng(fc.seed + 1234)
-        if fc.sampler == "elm":
-            self.W, self.b = self._sample_elm(rng)
-        elif fc.sampler == "swim":
-            self.W, self.b = self._sample_swim(rng)
-        else:
-            raise ValueError("sampler must be elm or swim")
+    @staticmethod
+    def _multiply(matrix, value):
+        # Avoid repeatedly converting a large real matrix to complex inside
+        # BLAS on every RK45 RHS evaluation.
+        return matrix @ value.real + 1j * (matrix @ value.imag)
 
-        raw = self._raw_features(self.xy)
-        raw_lap = self._raw_laplacian(self.xy)
-        raw_boundary = self._raw_features(self.xy_boundary)
+    def reconstruct(self, c, x, y):
+        modes = np.arange(1, self.s + 1) * np.pi / (2 * self.H)
+        sx = np.sin(np.outer(np.asarray(x) + self.H, modes)) / np.sqrt(self.H)
+        sy = np.sin(np.outer(np.asarray(y) + self.H, modes)) / np.sqrt(self.H)
+        return sy @ self._multiply(self.Q, c).reshape(self.s, self.s) @ sx.T
 
-        # boundary-compliant layer
-        _, s_b, Vh_b = np.linalg.svd(raw_boundary.T, full_matrices=True)
-        if len(s_b) > 0:
-            tol_b = max(raw_boundary.T.shape) * np.finfo(float).eps * s_b[0]
-            rank_b = int(np.sum(s_b > tol_b))
-        else:
-            rank_b = 0
-        A = Vh_b[rank_b:, :]
-        if A.shape[0] == 0:
-            raise RuntimeError(
-                "Boundary-compliant layer has zero width. Increase hidden_width or reduce boundary_side."
-            )
-
-        boundary_compliant = A @ raw
-        V, s, _ = np.linalg.svd(boundary_compliant, full_matrices=False)
-        if s[0] <= 0:
-            raise RuntimeError("Frozen-PINN feature matrix has zero rank.")
-        keep = s >= fc.svd_cutoff * s[0]
-        if not np.any(keep):
-            keep[0] = True
-        self.singular_values = s
-        self.Ar = V[:, keep].T @ A
-
-        self.B = (self.Ar @ raw).astype(np.complex128)
-        self.B_lap = (self.Ar @ raw_lap).astype(np.complex128)
-        self.R = self.B.shape[0]
-        self.B_plus = np.linalg.pinv(self.B, rcond=fc.pinv_rcond)
-        self.boundary_residual = float(np.max(np.abs(self.Ar @ raw_boundary)))
-
-        xy_eval = np.column_stack([system.X.ravel(), system.Y.ravel()])
-        self.B_eval = self.basis_at(xy_eval)
-
-    def _sample_elm(self, rng):
-        fc = self.cfg.frozen_pinn
-        W = rng.standard_normal((fc.hidden_width, 2))
-        b = rng.uniform(-fc.elm_bias_range, fc.elm_bias_range, fc.hidden_width)
-        return W, b
-
-    def _sample_swim(self, rng):
-        fc = self.cfg.frozen_pinn
-        n = self.xy.shape[0]
-        i1 = rng.integers(0, n, fc.hidden_width)
-        i2 = rng.integers(0, n, fc.hidden_width)
-        same = i1 == i2
-        while np.any(same):
-            i2[same] = rng.integers(0, n, np.sum(same))
-            same = i1 == i2
-        x1 = self.xy[i1]
-        x2 = self.xy[i2]
-        d = x2 - x1
-        norm2 = np.sum(d * d, axis=1)
-        bad = norm2 < 1e-10
-        while np.any(bad):
-            i2[bad] = rng.integers(0, n, np.sum(bad))
-            x2[bad] = self.xy[i2[bad]]
-            d = x2 - x1
-            norm2 = np.sum(d * d, axis=1)
-            bad = norm2 < 1e-10
-        s = np.arctanh(0.5)
-        W = 2.0 * s * d / norm2[:, None]
-        b = -s - np.sum(W * x1, axis=1)
-        return W, b
-
-    def _raw_features(self, xy_normalized):
-        a = self.W @ xy_normalized.T + self.b[:, None]
-        return np.tanh(a)
-
-    def _raw_laplacian(self, xy_normalized):
-        oc = self.cfg.optical
-        H = self._raw_features(xy_normalized)
-        sigma_second = -2.0 * H * (1.0 - H**2)
-        w_phys_sq = np.sum(self.W**2, axis=1) / oc.half_width**2
-        return sigma_second * w_phys_sq[:, None]
-
-    def basis_at(self, xy_physical):
-        oc = self.cfg.optical
-        xy_n = np.asarray(xy_physical) / oc.half_width
-        raw = self._raw_features(xy_n)
-        return (self.Ar @ raw).astype(np.complex128)
-
-    def initial_coefficients(self, field_values):
-        values = np.asarray(field_values, dtype=np.complex128).reshape(-1)
-        return self.B_plus.T @ values
-
-    def G(self, delta_n_colloc):
-        oc = self.cfg.optical
-        dn = np.asarray(delta_n_colloc).reshape(-1)
-        L_basis = (
-            (1j / (2.0 * oc.k0)) * self.B_lap.T
-            + 1j * oc.k0 * dn[:, None] * self.B.T
-            - (oc.attenuation / 2.0) * self.B.T
-        )
-        return self.B_plus.T @ L_basis
+    def rhs(self, c, dn):
+        o = self.cfg.optical
+        field = self.from_modal(self._multiply(self.Q, c))
+        potential = self._multiply(self.Q.T, self.to_modal(dn * field))
+        return 1j / (2 * o.k0) * self._multiply(self.laplacian, c) + 1j * o.k0 * potential - o.attenuation / 2 * c
 
 
 class FrozenPINNSolver:
     name = "Frozen-PINN"
 
-    def __init__(self, system: OpticalPATSystem, cfg: ExperimentConfig):
-        self.system = system
-        self.cfg = cfg
+    def __init__(self, system, cfg):
+        self.system, self.cfg = system, cfg
+        start = time.perf_counter()
         self.basis = FrozenPINNBasis(system, cfg)
+        self.basis_setup_time_sec = time.perf_counter() - start
+        self._interval = None
+        self._reduced = None
+        self.atmosphere_integrations = 0
+        self.initial_field_relative_error = None
+        self.interval_diagnostics = {}
 
-        b0 = self.system.gaussian_beam(
-            self.basis.xc,
-            self.basis.yc,
-        ).astype(np.complex128)
-        c0 = self.basis.initial_coefficients(b0)
-        U0_hat = (self.basis.B_eval.T @ c0).reshape(self.system.X.shape)
-        U0_true = self.system.gaussian_beam(
-            self.system.X,
-            self.system.Y,
-        ).astype(np.complex128)
+    def _integrate_coefficients(self, c, interval):
+        """CPU reference for the collocation least-squares evolution."""
+        b, f = self.basis, self.cfg.frozen_pinn
+        nfev = 0
+        start = time.perf_counter()
+        for left, right in zip(self.system.turbulence.edges[:-1], self.system.turbulence.edges[1:]):
+            dn = self.system.turbulence.eval(b.X, b.Y, (left + right) / 2, interval)
+            sol = solve_ivp(lambda z, state: b.rhs(state, dn), (left, right), c,
+                            method="RK45", rtol=f.ode_rtol, atol=f.ode_atol, t_eval=[right])
+            if not sol.success or not np.all(np.isfinite(sol.y)):
+                raise RuntimeError(f"Frozen-PINN RK45 failed: {sol.message}")
+            c = sol.y[:, -1]
+            nfev += sol.nfev
+        return c, dict(ode_nfev=nfev, atmosphere_backend="scipy_cpu_matrix_free_RK45",
+                       coefficient_evolution_time_sec=time.perf_counter()-start,
+                       operator_setup_time_sec=0.0)
 
-        dA = self.system.dx * self.system.dy
-        self.initial_field_relative_error = float(
-            np.linalg.norm(U0_hat - U0_true)
-            / max(np.linalg.norm(U0_true), 1e-30)
-        )
-        P_hat = float(np.sum(np.abs(U0_hat)**2) * dA)
-        P_true = float(np.sum(np.abs(U0_true)**2) * dA)
-        self.initial_power_ratio = P_hat / max(P_true, 1e-30)
-
-        if self.initial_field_relative_error > 0.25:
-            print(
-                "[Frozen-PINN warning] Poor initial-field representation: "
-                f"relative error={self.initial_field_relative_error:.3f}, "
-                f"power ratio={self.initial_power_ratio:.3f}."
-            )
-
-    def _initial_state(self, theta):
-        oc = self.cfg.optical
-        b = self.system.gaussian_beam(self.basis.xc, self.basis.yc) * np.exp(
-            1j * oc.k0 * (theta[0] * self.basis.xc + theta[1] * self.basis.yc)
-        )
-        c0 = self.basis.initial_coefficients(b)
-        bx = 1j * oc.k0 * self.basis.xc * b
-        by = 1j * oc.k0 * self.basis.yc * b
-        sx0 = self.basis.initial_coefficients(bx)
-        sy0 = self.basis.initial_coefficients(by)
-        return np.column_stack([c0, sx0, sy0])
-
-    def propagate(self, theta, interval):
-        fc = self.cfg.frozen_pinn
-        oc = self.cfg.optical
-        S0 = self._initial_state(theta)
-        R = self.basis.R
-
-        def rhs(z, y):
-            S = y.reshape(R, 3)
-            dn = self.system.turbulence.eval(
-                self.basis.xc, self.basis.yc, z, interval
-            )
-            G = self.basis.G(dn)
-            return (G @ S).reshape(-1)
-
-        sol = solve_ivp(
-            rhs,
-            (0.0, oc.propagation_distance),
-            S0.reshape(-1),
-            method="RK45",
-            rtol=fc.ode_rtol,
-            atol=fc.ode_atol,
-        )
-        if not sol.success:
-            raise RuntimeError(sol.message)
-        SL = sol.y[:, -1].reshape(R, 3)
-        U = (self.basis.B_eval.T @ SL[:, 0]).reshape(self.system.X.shape)
-        dUx = (self.basis.B_eval.T @ SL[:, 1]).reshape(self.system.X.shape)
-        dUy = (self.basis.B_eval.T @ SL[:, 2]).reshape(self.system.X.shape)
-        return U, dUx, dUy
-
-    def _power_gradient(self, U, dUx, dUy, target):
-        A = self.system.aperture_mask(target)
-        dA = self.system.dx * self.system.dy
-        Q = np.sum(A * np.abs(U) ** 2) * dA
-        gx = 2.0 * np.real(np.sum(A * np.conj(U) * dUx) * dA)
-        gy = 2.0 * np.real(np.sum(A * np.conj(U) * dUy) * dA)
-        return float(Q), np.array([gx, gy])
-
-    def _coupling_gradient(self, U, dUx, dUy, target):
-        psi = self.system.smf_mode(target)
-        dA = self.system.dx * self.system.dy
-        a = np.sum(U * np.conj(psi)) * dA
-        B = np.sum(np.abs(U) ** 2) * dA
-        C = np.sum(np.abs(psi) ** 2) * dA
-        Q = np.abs(a) ** 2 / max(B * C, 1e-30)
-        grad = []
-        for dU in (dUx, dUy):
-            da = np.sum(dU * np.conj(psi)) * dA
-            dB = 2.0 * np.real(np.sum(np.conj(U) * dU) * dA)
-            dQ = (
-                2.0 * np.real(np.conj(a) * da) * B - np.abs(a) ** 2 * dB
-            ) / max(B**2 * C, 1e-30)
-            grad.append(dQ)
-        return float(np.real(Q)), np.asarray(grad)
-
-    def _centroid_gradient(self, U, dUx, dUy, target):
-        W = self.system.centroid_roi_mask(target)
-        dA = self.system.dx * self.system.dy
-        I = np.abs(U) ** 2
-        D = max(np.sum(W * I) * dA, 1e-30)
-        Nx = np.sum(W * self.system.X * I) * dA
-        Ny = np.sum(W * self.system.Y * I) * dA
-        p = np.array([Nx / D, Ny / D])
-        J = np.zeros((2, 2), dtype=float)
-        for j, dU in enumerate((dUx, dUy)):
-            dI = 2.0 * np.real(np.conj(U) * dU)
-            dD = np.sum(W * dI) * dA
-            dNx = np.sum(W * self.system.X * dI) * dA
-            dNy = np.sum(W * self.system.Y * dI) * dA
-            J[0, j] = (dNx * D - Nx * dD) / D**2
-            J[1, j] = (dNy * D - Ny * dD) / D**2
-        e = p - np.asarray(target)
-        Q = -np.dot(e, e)
-        grad = -2.0 * J.T @ e
-        return float(Q), grad
-
-    def _metric_gradient(self, U, dUx, dUy, target):
-        objective = self.cfg.tracking.objective
-        if objective == "power":
-            return self._power_gradient(U, dUx, dUy, target)
-        if objective == "coupling":
-            return self._coupling_gradient(U, dUx, dUy, target)
-        if objective == "centroid":
-            return self._centroid_gradient(U, dUx, dUy, target)
-        raise ValueError("objective must be power, coupling, or centroid")
-
-    def solve(self, interval: int, target, theta_prev, history):
-        t0 = time.perf_counter()
-
-        def objective_and_gradient(theta):
-            U, dUx, dUy = self.propagate(
-                theta,
-                interval,
-            )
-            return self._metric_gradient(
-                U,
-                dUx,
-                dUy,
-                target,
-            )
-
-        def objective_only(theta):
-            U, _, _ = self.propagate(
-                theta,
-                interval,
-            )
-            return self.system.metric(
-                U,
-                target,
-                self.cfg.tracking.objective,
-            )
-
-        initial_theta = None
-        if self.cfg.tracking.objective == "centroid":
-            initial_theta = np.asarray(target, dtype=float) / max(self.system.cfg.optical.propagation_distance, 1e-30)
-
-        theta, predicted_metric, opt_diag = (
-            projected_gradient_ascent(
-                theta_prev,
-                objective_and_gradient,
-                objective_only,
-                self.cfg.tracking,
-                initial_theta=initial_theta,
-            )
-        )
-
-        runtime = time.perf_counter() - t0
-
-        diagnostics = {
-            "basis_rank": int(self.basis.R),
-            "boundary_residual": self.basis.boundary_residual,
-            "initial_field_relative_error": self.initial_field_relative_error,
-            "initial_power_ratio": self.initial_power_ratio,
+    def prepare_interval(self, interval):
+        if self._interval == interval:
+            return
+        start = time.perf_counter()
+        b, o, f = self.basis, self.cfg.optical, self.cfg.frozen_pinn
+        u0 = self.system.tx_field(interval, b.X, b.Y)
+        c = b.initial_coefficients(u0)
+        # Evaluate fit error on an independent grid, not the fit samples.
+        check_axis = np.linspace(-o.half_width, o.half_width, max(128, 2 * b.n), endpoint=False)
+        X, Y = np.meshgrid(check_axis, check_axis)
+        truth = self.system.tx_field(interval, X, Y)
+        error = np.linalg.norm(b.reconstruct(c, check_axis, check_axis) - truth) / np.linalg.norm(truth)
+        self.initial_field_relative_error = float(error)
+        initial_norm = np.linalg.norm(c)
+        c, integration = self._integrate_coefficients(c, interval)
+        # Evaluate the frozen field directly at reducer preimage coordinates;
+        # no giant [receiver_pixels x rank] matrix is formed.
+        axis = self.system.rx / o.reducer_magnification
+        field = b.reconstruct(c, axis, axis)
+        reduced = (np.sqrt(o.reducer_transmission) / abs(o.reducer_magnification)
+                   * field * self.system.reduced_mask
+                   * np.exp(1j * o.reducer_phase_curvature * (self.system.RX**2 + self.system.RY**2)))
+        self._interval, self._reduced, self._coefficients = interval, reduced, c
+        self.atmosphere_integrations += 1
+        self.interval_diagnostics = {
+            "basis_rank": b.R, "boundary_residual": b.boundary_residual,
+            "basis_setup_time_sec": self.basis_setup_time_sec,
+            "initial_field_relative_error": float(error),
+            "coefficient_power_ratio": float(np.linalg.norm(c)**2 / max(initial_norm**2, 1e-30)),
+            "expected_extinction_ratio": float(10**(-o.path_loss_db / 10)),
+            "atmosphere_prepare_time_sec": time.perf_counter() - start,
+            "atmosphere_integrations_this_interval": 1, **integration,
+            "ode_solver": "scipy_RK45", "boundary_transform": "fixed_Dirichlet_sine_projection",
+            "atmosphere_depends_on_fsm": False,
         }
 
-        diagnostics.update(opt_diag)
+    def objective_and_gradient(self, theta, interval, target=None):
+        self.prepare_interval(interval)
+        return self.system.power_and_gradient(self._reduced, theta)
 
-        if self.cfg.tracking.objective == "centroid":
-            U_pred, _, _ = self.propagate(theta, interval)
-            diagnostics["predicted_centroid"] = self.system.centroid(
-                U_pred, target
-            ).tolist()
+    def objective_only(self, theta, interval, target=None):
+        self.prepare_interval(interval)
+        return self.system.power(self.system.detector_field(self._reduced, theta))
 
-        return {
-            "theta": theta,
-            "predicted_metric": predicted_metric,
-            "runtime_sec": runtime,
-            "diagnostics": diagnostics,
-        }
+    def reconstruct_field(self, theta, interval):
+        self.prepare_interval(interval)
+        return self.system.detector_field(self._reduced, theta)
 
+    def solve(self, interval, target, theta_prev, history, measurement=None, measurement_valid=True):
+        start = time.perf_counter()
+        self.prepare_interval(interval)
+        initial = sensing_initial_command(self.system, theta_prev, measurement, measurement_valid)
+        query_start = time.perf_counter()
+        theta, value, diag = projected_gradient_ascent(theta_prev,
+            lambda command: self.objective_and_gradient(command, interval),
+            lambda command: self.objective_only(command, interval), self.cfg.tracking, initial)
+        query_time = time.perf_counter() - query_start
+        predicted_centroid = self.system.sensing_vector(self._reduced, theta)[:2]
+        diag.update(self.interval_diagnostics)
+        diag.update(predicted_centroid=predicted_centroid, initial_command=initial,
+                    sensing_valid=measurement_valid, query_runtime_sec=query_time,
+                    gradient_backend="analytic_receiver_sensitivity", device="cpu", effective_dtype="float64")
+        return dict(theta=theta, predicted_metric=value, runtime_sec=time.perf_counter() - start,
+                    diagnostics=diag)

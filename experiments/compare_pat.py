@@ -1,410 +1,140 @@
 #!/usr/bin/env python3
-"""CLI-driven PAT solver comparison."""
-
+"""Run receiver-FSM PAT experiments from PAT (1).pdf."""
 from __future__ import annotations
-
 import argparse
 import sys
 from pathlib import Path
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+from config.settings import make_preset
+from simulation.runner import run_repeated_comparison, replot_results
 
-from config.settings import (
-    ExperimentConfig,
-    OpticalConfig,
-    TurbulenceConfig,
-    FrozenPINNConfig,
-    BaselineConfig,
-    TrackingConfig,
-)
-from simulation.runner import run_repeated_comparison
-
-
-DEFAULT_SOLVERS = [
-    "frozen_pinn",
-    "pid",
-    "linear_mpc",
-    "ssfm_oracle",
-    "no_control",
-]
+DEFAULT_SOLVERS = ["frozen_pinn", "pid", "linear_mpc", "ssfm_oracle", "no_control"]
 
 
 def build_parser():
-    p = argparse.ArgumentParser(
-        description="Compare Frozen-PINN PAT against baselines.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-
-    g = p.add_argument_group("experiment")
-    g.add_argument("--name", default=None, help="Result folder name.")
-    g.add_argument("--objective", choices=["power", "coupling", "centroid"], default="power")
-    g.add_argument(
-        "--solvers",
-        nargs="+",
-        default=DEFAULT_SOLVERS,
-        choices=[
-            "frozen_pinn",
-            "pid",
-            "linear_mpc",
-            "ssfm_oracle",
-            "ssfm_oracle_cpu",
-            "no_control",
-        ],
-    )
-    g.add_argument("--intervals", type=int, default=8, help="PAT control intervals.")
-    g.add_argument(
-        "--repeat",
-        "--repeats",
-        dest="repeats",
-        type=int,
-        default=1,
-        help="Independent repetitions with incremented seeds.",
-    )
-    g.add_argument("--seed", type=int, default=7, help="Base random seed.")
-    g.add_argument(
-        "--vary-frozen-seed",
-        action="store_true",
-        help="Also vary the Frozen-PINN random-feature seed across repeats.",
-    )
-
-    g = p.add_argument_group("output")
-    g.add_argument("--gif", action="store_true", help="Save comparison.gif for each run.")
-    g.add_argument("--fps", type=int, default=3, help="GIF frames per second.")
-    g.add_argument("--output-root", default=str(PROJECT_ROOT / "results"))
-
-    g = p.add_argument_group("compute")
-    g.add_argument(
-        "--device",
-        choices=["auto", "cpu", "cuda", "mps"],
-        default="auto",
-        help=(
-            "Common accelerator for Frozen-PINN and the default "
-            "differentiable SSFM oracle."
-        ),
-    )
-    g.add_argument(
-        "--dtype",
-        choices=["float64", "float32"],
-        default="float64",
-        help=(
-            "Requested precision for both Frozen-PINN and differentiable SSFM. "
-            "MPS automatically forces float32."
-        ),
-    )
-
-    g = p.add_argument_group("optical system")
-    g.add_argument("--grid-size", type=int, default=48)
-    g.add_argument("--distance", type=float, default=20.0)
-    g.add_argument("--transmit-power", type=float, default=1.0)
-    g.add_argument("--beam-waist", type=float, default=2.5e-3)
-    g.add_argument("--aperture-radius", type=float, default=2.4e-3)
-    g.add_argument("--smf-mode-waist", type=float, default=1.7e-3)
-
-    g = p.add_argument_group("turbulence")
-    g.add_argument("--delta-n-rms", type=float, default=8e-9)
-    g.add_argument("--turbulence-modes", type=int, default=10)
-
-    g = p.add_argument_group("Frozen-PINN")
-    g.add_argument("--frozen-sampler", choices=["elm", "swim"], default="elm")
-    g.add_argument(
-        "--frozen-backend",
-        choices=["auto", "scipy", "torch"],
-        default="auto",
-        help=(
-            "Frozen-PINN propagation backend. "
-            "auto uses the optimized torch backend on CPU/CUDA/MPS."
-        ),
-    )
-    g.add_argument(
-        "--frozen-device",
-        choices=["same", "auto", "cpu", "cuda", "mps"],
-        default="same",
-        help=(
-            "Frozen-PINN device override. 'same' uses --device, "
-            "which is recommended for fair comparison."
-        ),
-    )
-    g.add_argument(
-        "--frozen-dtype",
-        choices=["same", "float64", "float32"],
-        default="same",
-        help=(
-            "Frozen-PINN precision override. 'same' uses --dtype. "
-            "MPS automatically forces float32."
-        ),
-    )
-    g.add_argument(
-        "--frozen-rk-steps",
-        type=int,
-        default=64,
-        help="Fixed RK4 steps for torch Frozen-PINN propagation.",
-    )
-    g.add_argument("--hidden-width", type=int, default=1000)
-    g.add_argument("--collocation-side", type=int, default=24)
-    g.add_argument("--boundary-side", type=int, default=16)
-    g.add_argument("--svd-cutoff", type=float, default=1e-6)
-    g.add_argument("--pinv-rcond", type=float, default=1e-6)
-    g.add_argument("--ode-rtol", type=float, default=1e-5)
-    g.add_argument("--ode-atol", type=float, default=1e-8)
-
-    g = p.add_argument_group("PAT optimization")
-    g.add_argument(
-        "--max-opt-iters",
-        "--opt-iters",
-        "--frozen-opt-iters",
-        "--oracle-opt-iters",
-        dest="max_opt_iters",
-        type=int,
-        default=20,
-        help=(
-            "Maximum numerical optimizer iterations. "
-            "This does NOT change the physical FSM slew limit."
-        ),
-    )
-    g.add_argument(
-        "--optimizer-step",
-        "--theta-step-max",
-        dest="optimizer_step",
-        type=float,
-        default=40e-6,
-        help="Initial numerical line-search step [rad].",
-    )
-    g.add_argument(
-        "--theta-max",
-        type=float,
-        default=250e-6,
-        help="Absolute physical FSM deflection limit [rad].",
-    )
-    g.add_argument(
-        "--theta-slew-rate",
-        type=float,
-        default=18e-3,
-        help="Physical FSM slew-rate limit [rad/s].",
-    )
-    g.add_argument(
-        "--theta-slew-max",
-        type=float,
-        default=None,
-        help=(
-            "Optional per-interval slew override [rad]. If omitted, the limit "
-            "is --theta-slew-rate times --control-interval."
-        ),
-    )
-    g.add_argument(
-        "--line-search-steps",
-        type=int,
-        default=10,
-    )
-    g.add_argument(
-        "--optimizer-min-step",
-        type=float,
-        default=1e-9,
-    )
-    g.add_argument(
-        "--gradient-tol",
-        type=float,
-        default=1e-12,
-    )
-    g.add_argument(
-        "--objective-rel-tol",
-        type=float,
-        default=1e-6,
-    )
-    g.add_argument(
-        "--objective-abs-tol",
-        type=float,
-        default=1e-12,
-    )
-    g.add_argument(
-        "--control-regularization",
-        type=float,
-        default=0.0,
-    )
-
-    g = p.add_argument_group("baselines")
-    g.add_argument("--pid-kp", type=float, default=0.80)
-    g.add_argument("--pid-ki", type=float, default=8.0)
-    g.add_argument("--pid-kd", type=float, default=1e-3)
-    g.add_argument("--mpc-rho", type=float, default=0.15)
-    g.add_argument("--oracle-fd-step", type=float, default=2e-6)
-
-    g = p.add_argument_group("simulation")
-    g.add_argument("--ssfm-steps", type=int, default=20)
-    g.add_argument(
-        "--control-interval",
-        type=float,
-        default=0.01,
-        help="Physical PAT control interval T_c [s].",
-    )
-    g.add_argument(
-        "--target-period",
-        type=float,
-        default=2.0,
-        help="Physical target-trajectory period [s].",
-    )
-    g.add_argument("--target-x-amplitude", type=float, default=2.4e-3)
-    g.add_argument("--target-y-amplitude", type=float, default=1.8e-3)
-    g.add_argument("--target-y-phase", type=float, default=0.0)
-
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    p.add_argument("--preset", choices=["demo", "paper"], default="paper")
+    p.add_argument("--replot", type=Path, help="Regenerate figures/GIF from an existing result directory or results.json; keep numerical results")
+    p.add_argument("--name", help="New result directory; existing results are never overwritten")
+    p.add_argument("--objective", choices=["power"], default="power", help="PDF Eq. (20), collected communication power")
+    p.add_argument("--solvers", nargs="+", choices=DEFAULT_SOLVERS+["ssfm_oracle_cpu"], default=DEFAULT_SOLVERS)
+    p.add_argument("--intervals", type=int)
+    p.add_argument("--repeat", "--repeats", dest="repeats", type=int, default=1)
+    p.add_argument("--feature-seeds", type=int, default=1, help="Cartesian feature-seed repetitions for each channel seed")
+    p.add_argument("--paper-ensemble", action="store_true", help="100 channel seeds x 5 feature seeds (expensive); implies --preset paper")
+    p.add_argument("--vary-frozen-seed", action="store_true", help="Legacy option: also shift feature seed with channel seed")
+    p.add_argument("--seed", type=int, default=7)
+    p.add_argument("--feature-seed", type=int, default=7)
+    p.add_argument("--gif", action=argparse.BooleanOptionalAction, default=True, help="Save detector XY animation; --no-gif disables it")
+    p.add_argument("--fps", type=int, default=8)
+    p.add_argument("--output-root", default=str(PROJECT_ROOT / "results"))
+    p.add_argument("--device", choices=["cpu", "cuda", "mps", "auto"], default="cpu", help="Receiver and PINN layer-projection device; auto selects CUDA, MPS, then CPU. RK45 and SSFM propagation use CPU")
+    p.add_argument("--dtype", choices=["float64", "float32"], default="float64", help="Torch receiver precision; MPS uses float32. RK45 remains float64")
+    p.add_argument("--frozen-backend", choices=["scipy", "torch", "auto"], default="auto", help="auto/torch follows --device for receiver queries; scipy explicitly uses CPU")
+    p.add_argument("--frozen-operator", choices=["auto", "matrix_free", "projected"], default="auto", help="auto assembles the Galerkin operator once per layer on GPU; matrix_free retains the CPU reference RHS")
+    p.add_argument("--disturbance", choices=["iid", "periodic", "zero"], default="iid")
+    # Unspecified overrides inherit the selected preset.
+    fields = {
+        "optical": {"grid-size": int, "receiver-grid-size": int, "distance": float,
+            "transmit-power": float, "beam-waist": float, "half-width": float,
+            "tx-angular-std": float, "path-loss-db": float, "entrance-diameter": float,
+            "reducer-magnification": float, "reducer-transmission": float,
+            "focal-length": float, "aperture-radius": float, "detector-sampling": float,
+            "psd-position-noise-std": float},
+        "turbulence": {"ground-cn2": float, "hv-wind-speed": float, "outer-scale": float,
+            "inner-scale": float, "turbulence-strength": float, "turbulence-modes": int,
+            "layer-thickness": float},
+        "Frozen-PINN": {"hidden-width": int, "collocation-side": int, "spectral-side": int,
+            "feature-scale-max": float, "svd-cutoff": float, "ode-rtol": float, "ode-atol": float},
+        "steering": {"control-interval": float, "target-period": float, "ssfm-steps": int,
+            "theta-max": float, "theta-slew-rate": float, "theta-slew-max": float,
+            "theta-quantization": float, "max-opt-iters": int, "optimizer-step": float,
+            "line-search-steps": int, "line-search-shrink": float},
+        "baselines": {"pid-kp": float, "pid-ki": float, "pid-kd": float, "mpc-rho": float,
+            "oracle-fd-step": float}}
+    for group, args in fields.items():
+        g = p.add_argument_group(group)
+        for name, kind in args.items():
+            g.add_argument("--"+name, type=kind)
+    p.add_argument("--detector-offset", type=float, nargs=2, metavar=("X_M", "Y_M"))
     return p
 
 
 def make_config(args):
-    name = args.name if args.name is not None else f"{args.objective}_comparison"
-
-    frozen_device = (
-        args.device
-        if args.frozen_device == "same"
-        else args.frozen_device
-    )
-
-    frozen_dtype = (
-        args.dtype
-        if args.frozen_dtype == "same"
-        else args.frozen_dtype
-    )
-
-    return ExperimentConfig(
-        name=name,
-        optical=OpticalConfig(
-            transmit_power=args.transmit_power,
-            beam_waist=args.beam_waist,
-            propagation_distance=args.distance,
-            grid_size=args.grid_size,
-            aperture_radius=args.aperture_radius,
-            smf_mode_waist=args.smf_mode_waist,
-        ),
-        turbulence=TurbulenceConfig(
-            delta_n_rms=args.delta_n_rms,
-            num_modes=args.turbulence_modes,
-            seed=args.seed,
-        ),
-        frozen_pinn=FrozenPINNConfig(
-            sampler=args.frozen_sampler,
-            backend=args.frozen_backend,
-            device=frozen_device,
-            dtype=frozen_dtype,
-            rk_steps=args.frozen_rk_steps,
-            hidden_width=args.hidden_width,
-            collocation_side=args.collocation_side,
-            boundary_side=args.boundary_side,
-            svd_cutoff=args.svd_cutoff,
-            pinv_rcond=args.pinv_rcond,
-            num_opt_iterations=args.max_opt_iters,
-            ode_rtol=args.ode_rtol,
-            ode_atol=args.ode_atol,
-            theta_step_max=args.optimizer_step,
-            theta_max=args.theta_max,
-            line_search_steps=args.line_search_steps,
-            lambda_theta=args.control_regularization,
-            seed=args.seed,
-        ),
-        baselines=BaselineConfig(
-            ssfm_device=args.device,
-            ssfm_dtype=args.dtype,
-            pid_kp=args.pid_kp,
-            pid_ki=args.pid_ki,
-            pid_kd=args.pid_kd,
-            mpc_rho=args.mpc_rho,
-            theta_max=args.theta_max,
-            oracle_num_iterations=args.max_opt_iters,
-            oracle_fd_step=args.oracle_fd_step,
-            oracle_theta_step_max=args.optimizer_step,
-            oracle_line_search_steps=args.line_search_steps,
-        ),
-        tracking=TrackingConfig(
-            objective=args.objective,
-            num_intervals=args.intervals,
-            control_interval_sec=args.control_interval,
-            target_period_sec=args.target_period,
-            target_x_amplitude=args.target_x_amplitude,
-            target_y_amplitude=args.target_y_amplitude,
-            target_y_phase=args.target_y_phase,
-            ssfm_steps=args.ssfm_steps,
-            theta_max=args.theta_max,
-            theta_slew_rate=args.theta_slew_rate,
-            theta_slew_max_override=args.theta_slew_max,
-            max_opt_iterations=args.max_opt_iters,
-            optimizer_step=args.optimizer_step,
-            line_search_steps=args.line_search_steps,
-            optimizer_min_step=args.optimizer_min_step,
-            gradient_norm_tol=args.gradient_tol,
-            objective_rel_tol=args.objective_rel_tol,
-            objective_abs_tol=args.objective_abs_tol,
-            control_regularization=args.control_regularization,
-        ),
-    )
+    cfg = make_preset("paper" if args.paper_ensemble else args.preset)
+    cfg.name = args.name or cfg.name
+    cfg.turbulence.seed = args.seed
+    cfg.frozen_pinn.seed = args.feature_seed
+    cfg.frozen_pinn.backend = args.frozen_backend
+    cfg.frozen_pinn.operator_backend = args.frozen_operator
+    cfg.frozen_pinn.device = cfg.baselines.ssfm_device = args.device
+    cfg.frozen_pinn.dtype = cfg.baselines.ssfm_dtype = args.dtype
+    cfg.tracking.disturbance = args.disturbance
+    mapping = {
+        "optical": dict(grid_size="grid_size", receiver_grid_size="receiver_grid_size",
+            distance="propagation_distance", transmit_power="transmit_power", beam_waist="beam_waist",
+            half_width="half_width", tx_angular_std="tx_angular_std", path_loss_db="path_loss_db",
+            entrance_diameter="entrance_diameter", reducer_magnification="reducer_magnification",
+            reducer_transmission="reducer_transmission", focal_length="focal_length",
+            aperture_radius="aperture_radius", detector_sampling="detector_sampling",
+            psd_position_noise_std="psd_position_noise_std"),
+        "turbulence": dict(ground_cn2="ground_cn2", hv_wind_speed="hv_wind_speed",
+            outer_scale="outer_scale", inner_scale="inner_scale", turbulence_strength="strength_scale",
+            turbulence_modes="num_modes", layer_thickness="layer_thickness"),
+        "frozen_pinn": {x:x for x in ["hidden_width", "collocation_side", "spectral_side",
+            "feature_scale_max", "svd_cutoff", "ode_rtol", "ode_atol"]},
+        "tracking": dict(intervals="num_intervals", control_interval="control_interval_sec",
+            target_period="target_period_sec", ssfm_steps="ssfm_steps", theta_max="theta_max",
+            theta_slew_rate="theta_slew_rate", theta_slew_max="theta_slew_max_override",
+            theta_quantization="theta_quantization", max_opt_iters="max_opt_iterations",
+            optimizer_step="optimizer_step", line_search_steps="line_search_steps",
+            line_search_shrink="line_search_shrink"),
+        "baselines": {x:x for x in ["pid_kp", "pid_ki", "pid_kd", "mpc_rho", "oracle_fd_step"]}}
+    for group, fields in mapping.items():
+        for arg, field in fields.items():
+            value = getattr(args, arg)
+            if value is not None:
+                setattr(getattr(cfg, group), field, value)
+    if args.focal_length is not None:
+        cfg.optical.splitter_to_psd = cfg.optical.splitter_to_detector = args.focal_length-cfg.optical.lens_to_splitter
+    if args.detector_offset is not None:
+        cfg.optical.detector_center = tuple(args.detector_offset)
+    cfg.validate()
+    return cfg
 
 
 def main():
     parser = build_parser()
     args = parser.parse_args()
-
-    if args.intervals < 1:
-        parser.error("--intervals must be >= 1")
-    if args.repeats < 1:
-        parser.error("--repeat must be >= 1")
-    if args.fps < 1:
-        parser.error("--fps must be >= 1")
-    if args.max_opt_iters < 1:
-        parser.error("--max-opt-iters must be >= 1")
-    if args.line_search_steps < 1:
-        parser.error("--line-search-steps must be >= 1")
-    if args.control_interval <= 0:
-        parser.error("--control-interval must be > 0")
-    if args.target_period <= 0:
-        parser.error("--target-period must be > 0")
-    if args.theta_slew_rate <= 0:
-        parser.error("--theta-slew-rate must be > 0")
-    if args.theta_slew_max is not None and args.theta_slew_max <= 0:
-        parser.error("--theta-slew-max must be > 0 when provided")
-    if args.optimizer_step <= 0:
-        parser.error("--optimizer-step must be > 0")
-
-    cfg = make_config(args)
-
-    print("Experiment configuration")
-    print(f"  name          : {cfg.name}")
-    print(f"  objective     : {args.objective}")
-    print(f"  solvers       : {', '.join(args.solvers)}")
-    print(f"  intervals     : {args.intervals}")
-    print(f"  repeats       : {args.repeats}")
-    print(f"  common device : {args.device}")
-    print(f"  common dtype  : {args.dtype}")
-    print(f"  control dt    : {args.control_interval:.6f} s")
-    print(f"  target period : {args.target_period:.6f} s")
-    print(f"  sim duration  : {args.intervals*args.control_interval:.6f} s")
-    print(f"  max opt iters : {args.max_opt_iters}")
-    print(f"  optimizer step: {args.optimizer_step*1e6:.2f} urad")
-    print(f"  FSM slew rate : {args.theta_slew_rate:.6g} rad/s")
-    print(f"  FSM slew/step : {cfg.tracking.theta_slew_max*1e6:.2f} urad")
-    print(f"  GIF           : {args.gif}")
-    if args.gif:
-        print(f"  GIF FPS       : {args.fps}")
-
-    result = run_repeated_comparison(
-        cfg=cfg,
-        solver_names=args.solvers,
-        output_root=Path(args.output_root),
-        repeats=args.repeats,
-        make_gif=args.gif,
-        gif_fps=args.fps,
-        vary_frozen_seed=args.vary_frozen_seed,
-    )
-
-    print("\nFinished.")
-    for idx, run in enumerate(result["runs"]):
-        print(f"Run {idx:03d} JSON : {run['json_path']}")
-        for path in run["plot_paths"]:
-            print(f"Run {idx:03d} plot : {path}")
-        if run["gif_path"] is not None:
-            print(f"Run {idx:03d} GIF  : {run['gif_path']}")
-
-    if result["aggregate_json_path"] is not None:
-        print(f"Aggregate JSON : {result['aggregate_json_path']}")
-        print(f"Aggregate plot : {result['aggregate_plot_path']}")
+    if min(args.repeats, args.feature_seeds, args.fps) < 1:
+        parser.error("repeats, feature-seeds and fps must be positive")
+    if args.replot:
+        result = replot_results(args.replot, make_gif=args.gif, gif_fps=args.fps)
+        print(f"Figures regenerated: {result['output_dir']}")
+        if result['gif_path']:
+            print(f"GIF: {result['gif_path']}")
+        return
+    try:
+        cfg = make_config(args)
+    except ValueError as exc:
+        parser.error(str(exc))
+    repeats = cfg.channel_realizations if args.paper_ensemble else args.repeats
+    features = cfg.feature_seeds if args.paper_ensemble else args.feature_seeds
+    print(f"{cfg.name}: preset={cfg.preset}, objective=P_D [W], receiver-side FSM")
+    print(f"{cfg.tracking.num_intervals} intervals x {repeats} channel seeds x {features} feature seeds")
+    print(f"Atmosphere: SSFM grid={cfg.optical.grid_size} x {cfg.optical.grid_size} spatial cells; PINN M={cfg.frozen_pinn.hidden_width} features, Nc={cfg.frozen_pinn.collocation_side} x {cfg.frozen_pinn.collocation_side} collocation points; RK45")
+    print(f"FSM: {cfg.tracking.theta_max*1e6:g} urad range, {cfg.tracking.theta_slew_max*1e6:g} urad/axis/interval, q={cfg.tracking.theta_quantization*1e6:g} urad")
+    print("Demo presets and explicit numerical overrides require convergence validation before paper claims.")
+    result = run_repeated_comparison(cfg, args.solvers, Path(args.output_root), repeats,
+        args.gif, args.fps, args.vary_frozen_seed, features)
+    for run in result["runs"]:
+        print(f"Saved: {run['output_dir']}")
+        if run['gif_path']:
+            print(f"GIF: {run['gif_path']}")
+    if result["aggregate_json_path"]:
+        print(f"Aggregate: {result['aggregate_json_path']}")
 
 
 if __name__ == "__main__":

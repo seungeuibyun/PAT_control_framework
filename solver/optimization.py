@@ -1,263 +1,94 @@
+"""Eqs. (43)-(47): box projection, PSD initialization and feasible quantization."""
 from __future__ import annotations
-
 import numpy as np
 
 
+def command_bounds(theta_prev, tracking_cfg):
+    previous = np.asarray(theta_prev, dtype=float)
+    limit = np.broadcast_to(tracking_cfg.theta_max, (2,))
+    slew = np.broadcast_to(tracking_cfg.theta_slew_max, (2,))
+    lower, upper = np.maximum(-limit, previous - slew), np.minimum(limit, previous + slew)
+    if np.any(lower > upper):
+        raise ValueError("Empty physical command set")
+    return lower, upper
+
+
 def project_pat_command(theta, theta_prev, tracking_cfg):
-    """Project a numerical optimizer iterate onto the physical FSM set.
-
-    Two constraints are enforced independently of the number of optimizer
-    iterations:
-
-        |theta_d| <= theta_max
-        ||theta - theta_prev||_2 <= theta_slew_rate * T_c
-
-    The second one is the physical per-control-interval slew constraint,
-    derived from a slew rate rather than the optimizer iteration count.
-    """
-    theta = np.asarray(theta, dtype=float).copy()
-    theta_prev = np.asarray(theta_prev, dtype=float)
-
-    theta = np.clip(
-        theta,
-        -tracking_cfg.theta_max,
-        tracking_cfg.theta_max,
-    )
-
-    delta = theta - theta_prev
-    delta_norm = np.linalg.norm(delta)
-
-    if (
-        np.isfinite(tracking_cfg.theta_slew_max)
-        and tracking_cfg.theta_slew_max > 0
-        and delta_norm > tracking_cfg.theta_slew_max
-    ):
-        delta *= (
-            tracking_cfg.theta_slew_max
-            / max(delta_norm, 1e-30)
-        )
-
-        theta = theta_prev + delta
-
-        theta = np.clip(
-            theta,
-            -tracking_cfg.theta_max,
-            tracking_cfg.theta_max,
-        )
-
-    return theta
+    lower, upper = command_bounds(theta_prev, tracking_cfg)
+    return np.clip(np.asarray(theta, dtype=float), lower, upper)
 
 
-def projected_gradient_ascent(
-    theta_prev,
-    objective_and_gradient,
-    objective_only,
-    tracking_cfg,
-    initial_theta=None,
-):
-    """Shared PAT optimizer used by Frozen-PINN and SSFM oracle.
+def quantize_pat_command(theta, theta_prev, tracking_cfg):
+    lower, upper = command_bounds(theta_prev, tracking_cfg)
+    q = tracking_cfg.theta_quantization
+    lo, hi = np.ceil(lower / q - 1e-10), np.floor(upper / q + 1e-10)
+    if np.any(lo > hi):
+        raise ValueError("No quantized command satisfies the range/slew constraints")
+    return np.clip(np.rint(np.asarray(theta) / q), lo, hi) * q
 
-    Numerical optimizer settings are deliberately separated from physical FSM
-    constraints. Increasing max_opt_iterations therefore does not increase the
-    physically reachable angular change in one PAT interval.
-    """
-    theta_prev = np.asarray(
-        theta_prev,
-        dtype=float,
-    )
 
-    if initial_theta is None:
-        theta = project_pat_command(
-            theta_prev,
-            theta_prev,
-            tracking_cfg,
-        )
-    else:
-        theta = project_pat_command(
-            np.asarray(initial_theta, dtype=float),
-            theta_prev,
-            tracking_cfg,
-        )
+def sensing_initial_command(system, theta_prev, measurement, valid):
+    if not valid:
+        return np.asarray(theta_prev, dtype=float).copy()
+    delta = np.linalg.pinv(system.psd_jacobian) @ (system.reference_centroid - measurement[:2])
+    return project_pat_command(np.asarray(theta_prev) + delta, theta_prev, system.cfg.tracking)
 
+
+def projected_gradient_ascent(theta_prev, objective_and_gradient, objective_only,
+                              tracking_cfg, initial_theta=None):
+    t = tracking_cfg
+    previous = np.asarray(theta_prev, dtype=float)
+    theta = project_pat_command(previous if initial_theta is None else initial_theta, previous, t)
     metric, grad = objective_and_gradient(theta)
-
-    regularization = float(
-        tracking_cfg.control_regularization
-    )
-
-    def penalized(metric_value, theta_value):
-        return (
-            float(metric_value)
-            - 0.5
-            * regularization
-            * np.sum(
-                (
-                    np.asarray(theta_value)
-                    - theta_prev
-                )
-                ** 2
-            )
-        )
-
-    obj = penalized(
-        metric,
-        theta,
-    )
-
-    reason = "max_iterations"
-    accepted_steps = 0
-    final_grad_norm = np.nan
-    final_step_norm = 0.0
-
-    for iteration in range(
-        int(tracking_cfg.max_opt_iterations)
-    ):
-        grad_obj = (
-            np.asarray(grad, dtype=float)
-            - regularization
-            * (theta - theta_prev)
-        )
-
-        grad_norm = float(
-            np.linalg.norm(grad_obj)
-        )
-
-        final_grad_norm = grad_norm
-
-        if not np.isfinite(grad_norm):
-            reason = "nonfinite_gradient"
-            break
-
-        if grad_norm <= tracking_cfg.gradient_norm_tol:
+    if not np.isfinite(metric):
+        raise FloatingPointError("Nonfinite initial detector power")
+    def penalized(value, command):
+        return float(value) - 0.5 * t.control_regularization * np.sum((command - previous)**2)
+    obj = penalized(metric, theta)
+    reason, accepted_steps, final_norm, final_step = "max_iterations", 0, None, 0.0
+    trace = [float(metric)]
+    for _ in range(t.max_opt_iterations):
+        g = np.asarray(grad) - t.control_regularization * (theta - previous)
+        norm = float(np.linalg.norm(g))
+        final_norm = norm if np.isfinite(norm) else None
+        if not np.isfinite(norm):
+            raise FloatingPointError("Nonfinite receiver power gradient")
+        if norm <= t.gradient_norm_tol:
             reason = "gradient_tol"
             break
-
-        direction = (
-            grad_obj
-            / max(grad_norm, 1e-30)
-        )
-
-        numerical_step = float(
-            tracking_cfg.optimizer_step
-        )
-
+        step = t.optimizer_step
         accepted = False
-        candidate = theta
-        candidate_metric = metric
-        candidate_obj = obj
-        actual_step_norm = 0.0
-
-        for _ in range(
-            int(tracking_cfg.line_search_steps)
-        ):
-            raw_candidate = (
-                theta
-                + numerical_step
-                * direction
-            )
-
-            candidate = project_pat_command(
-                raw_candidate,
-                theta_prev,
-                tracking_cfg,
-            )
-
-            actual_step_norm = float(
-                np.linalg.norm(
-                    candidate - theta
-                )
-            )
-
-            if (
-                actual_step_norm
-                <= tracking_cfg.optimizer_min_step
-            ):
-                numerical_step *= 0.5
-                continue
-
-            candidate_metric = objective_only(
-                candidate
-            )
-
-            candidate_obj = penalized(
-                candidate_metric,
-                candidate,
-            )
-
-            if candidate_obj >= obj:
-                accepted = True
-                break
-
-            numerical_step *= 0.5
-
+        for _ in range(t.line_search_steps):
+            candidate = project_pat_command(theta + step * g / norm, previous, t)
+            final_step = float(np.linalg.norm(candidate - theta))
+            if final_step > t.optimizer_min_step:
+                candidate_metric = objective_only(candidate)
+                candidate_obj = penalized(candidate_metric, candidate)
+                if np.isfinite(candidate_obj) and candidate_obj >= obj:
+                    accepted = True
+                    break
+            step *= t.line_search_shrink
         if not accepted:
             reason = "line_search_failed"
             break
-
-        improvement = float(
-            candidate_obj - obj
-        )
-
-        theta = candidate
-        metric = candidate_metric
-        obj = candidate_obj
+        improvement = candidate_obj - obj
+        tolerance = t.objective_abs_tol + t.objective_rel_tol * max(abs(obj), abs(candidate_obj))
+        theta, metric, obj = candidate, candidate_metric, candidate_obj
         accepted_steps += 1
-        final_step_norm = actual_step_norm
-
-        tolerance = (
-            float(
-                tracking_cfg.objective_abs_tol
-            )
-            + float(
-                tracking_cfg.objective_rel_tol
-            )
-            * max(
-                abs(obj),
-                abs(obj - improvement),
-                1e-12,
-            )
-        )
-
+        trace.append(float(metric))
         if improvement <= tolerance:
             reason = "objective_tol"
             break
-
-        # Refresh gradient only after accepting the iterate.
-        metric, grad = objective_and_gradient(
-            theta
-        )
-
-    else:
-        iteration = (
-            int(tracking_cfg.max_opt_iterations)
-            - 1
-        )
-
-    diagnostics = {
-        "optimizer_iterations": int(
-            accepted_steps
-        ),
-        "optimizer_stop_reason": reason,
-        "final_gradient_norm": (
-            None
-            if not np.isfinite(final_grad_norm)
-            else float(final_grad_norm)
-        ),
-        "final_numerical_step_norm": float(
-            final_step_norm
-        ),
-        "physical_command_change_norm": float(
-            np.linalg.norm(
-                theta - theta_prev
-            )
-        ),
-        "theta_slew_max": float(
-            tracking_cfg.theta_slew_max
-        ),
+        metric, grad = objective_and_gradient(theta)
+    continuous = theta.copy()
+    theta = quantize_pat_command(continuous, previous, t)
+    metric = objective_only(theta)  # prediction must describe the applied command
+    return theta, float(metric), {
+        "optimizer_iterations": accepted_steps, "optimizer_stop_reason": reason,
+        "final_gradient_norm": final_norm, "final_numerical_step_norm": final_step,
+        "continuous_command": continuous, "continuous_power_trace_w": trace,
+        "physical_command_change_norm": float(np.linalg.norm(theta - previous)),
+        "physical_command_change_by_axis": np.abs(theta - previous),
+        "theta_slew_max": np.broadcast_to(t.theta_slew_max, (2,)),
+        "theta_quantization": t.theta_quantization,
     }
-
-    return (
-        theta,
-        float(metric),
-        diagnostics,
-    )

@@ -1,0 +1,14 @@
+{
+  "plots": [
+    "objective_comparison.png",
+    "objective_comparison_all.png",
+    "runtime_comparison.png",
+    "centroid_trajectories.png",
+    "receiver_xy_comparison.png",
+    "power_gain_comparison.png"
+  ],
+  "gif_requested": true,
+  "gif": "comparison.gif",
+  "gif_frames": 3,
+  "fps": 8
+}

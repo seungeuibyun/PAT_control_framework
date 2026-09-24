@@ -1,0 +1,232 @@
+{
+  "config": {
+    "name": "paper_power_comparison",
+    "preset": "paper",
+    "model_version": "receiver_fsm_pdf_v1",
+    "reference_document": "PAT (1).pdf, Sections II-IV, Tables I-II",
+    "channel_realizations": 100,
+    "feature_seeds": 5,
+    "optical": {
+      "wavelength": 1.55e-06,
+      "transmit_power": 0.01,
+      "beam_waist": 0.05,
+      "propagation_distance": 20000.0,
+      "path_loss_db": 1.0,
+      "half_width": 1.0,
+      "grid_size": 1024,
+      "tx_displacement": [
+        0.0,
+        0.0
+      ],
+      "tx_angular_std": 5e-06,
+      "entrance_diameter": 0.1,
+      "reducer_magnification": 0.1,
+      "reducer_transmission": 0.97,
+      "reducer_phase_curvature": 0.0,
+      "receiver_grid_size": 1024,
+      "receiver_half_width": 0.006,
+      "focal_length": 0.2,
+      "fsm_to_lens": 0.05,
+      "lens_to_splitter": 0.05,
+      "splitter_to_psd": 0.15,
+      "splitter_to_detector": 0.15,
+      "splitter_transmission": 0.62,
+      "splitter_reflection": 0.27,
+      "splitter_phase": 0.0,
+      "fsm_calibration": [
+        [
+          2.0,
+          0.0
+        ],
+        [
+          0.0,
+          2.0
+        ]
+      ],
+      "psd_width": 0.01,
+      "psd_center": [
+        0.0,
+        0.0
+      ],
+      "detector_center": [
+        0.0,
+        0.0
+      ],
+      "aperture_radius": 7.5e-05,
+      "detector_sampling": 2e-06,
+      "detector_view_half_width": 0.00045,
+      "psd_padding": 2,
+      "psd_position_noise_std": 5e-06,
+      "psd_power_noise_std": 0.0,
+      "psd_min_power": 1e-12
+    },
+    "turbulence": {
+      "ground_cn2": 1.7e-14,
+      "hv_wind_speed": 21.0,
+      "outer_scale": 10.0,
+      "inner_scale": 0.005,
+      "strength_scale": 1.0,
+      "num_modes": 128,
+      "layer_thickness": 50.0,
+      "seed": 7
+    },
+    "frozen_pinn": {
+      "backend": "auto",
+      "operator_backend": "auto",
+      "device": "mps",
+      "dtype": "float64",
+      "hidden_width": 1024,
+      "collocation_side": 128,
+      "spectral_side": 48,
+      "feature_scale_max": 80.0,
+      "boundary_envelope_fraction": 0.35,
+      "svd_cutoff": 1e-06,
+      "ode_rtol": 1e-06,
+      "ode_atol": 1e-08,
+      "seed": 7
+    },
+    "baselines": {
+      "ssfm_device": "cpu",
+      "ssfm_dtype": "float64",
+      "pid_kp": 0.8,
+      "pid_ki": 8.0,
+      "pid_kd": 0.001,
+      "mpc_rho": 0.15,
+      "oracle_fd_step": 1e-07
+    },
+    "tracking": {
+      "objective": "power",
+      "num_intervals": 2,
+      "control_interval_sec": 0.01,
+      "disturbance": "iid",
+      "target_period_sec": 0.5,
+      "ssfm_steps": 400,
+      "theta_max": 0.001,
+      "theta_slew_rate": 0.01,
+      "theta_slew_max_override": null,
+      "theta_quantization": 1e-06,
+      "initial_theta": [
+        0.0,
+        0.0
+      ],
+      "max_opt_iterations": 20,
+      "optimizer_step": 5e-05,
+      "line_search_shrink": 0.5,
+      "line_search_steps": 10,
+      "optimizer_min_step": 1e-09,
+      "gradient_norm_tol": 1e-12,
+      "objective_rel_tol": 1e-06,
+      "objective_abs_tol": 1e-12,
+      "control_regularization": 0.0
+    }
+  },
+  "device": "mps",
+  "scope": "Atmospheric prediction + receiver field upload; excludes offline basis/operator construction and control queries",
+  "comparison": "Same features, rank, collocation, channels and RK45 tolerances; CPU matrix-free versus GPU-projected operator",
+  "summary": {
+    "reference_mean_prepare_sec": 12.476539666997269,
+    "projected_mean_prepare_sec": 4.675267791499209,
+    "preparation_speedup": 2.668625675235694,
+    "max_coefficient_relative_error": 6.0672019373511114e-05,
+    "max_power_relative_error": 3.479436530107067e-05,
+    "max_gradient_relative_error": 0.00010922250362005571
+  },
+  "records": [
+    {
+      "interval": 0,
+      "matrix_free_prepare_sec": 12.965555041999323,
+      "matrix_free_diagnostics": {
+        "basis_rank": 710,
+        "boundary_residual": 0.0,
+        "basis_setup_time_sec": 0.48975987500307383,
+        "initial_field_relative_error": 0.1998614155493013,
+        "coefficient_power_ratio": 0.7943045370997756,
+        "expected_extinction_ratio": 0.7943282347242815,
+        "atmosphere_prepare_time_sec": 12.962087832995167,
+        "atmosphere_integrations_this_interval": 1,
+        "ode_nfev": 10862,
+        "atmosphere_backend": "scipy_cpu_matrix_free_RK45",
+        "coefficient_evolution_time_sec": 12.946024374999979,
+        "operator_setup_time_sec": 0.0,
+        "ode_solver": "scipy_RK45",
+        "boundary_transform": "fixed_Dirichlet_sine_projection",
+        "atmosphere_depends_on_fsm": false
+      },
+      "projected_prepare_sec": 4.75391233299888,
+      "projected_diagnostics": {
+        "basis_rank": 710,
+        "boundary_residual": 0.0,
+        "basis_setup_time_sec": 0.48895850000553764,
+        "initial_field_relative_error": 0.1998614155493013,
+        "coefficient_power_ratio": 0.7943045373420182,
+        "expected_extinction_ratio": 0.7943282347242815,
+        "atmosphere_prepare_time_sec": 4.751902916999825,
+        "atmosphere_integrations_this_interval": 1,
+        "ode_nfev": 10862,
+        "atmosphere_backend": "mps_projected_scipy_cpu_RK45",
+        "operator_dtype": "float32",
+        "ode_dtype": "complex128",
+        "operator_setup_time_sec": 0.18095808300131466,
+        "coefficient_evolution_time_sec": 4.737247874996683,
+        "operator_assembly_time_sec": 4.270921959046973,
+        "ode_integration_time_sec": 0.40288912301912205,
+        "channel_sampling_time_sec": 0.06320866398891667,
+        "ode_solver": "scipy_RK45",
+        "boundary_transform": "fixed_Dirichlet_sine_projection",
+        "atmosphere_depends_on_fsm": false
+      },
+      "coefficient_relative_error": 4.503067809738936e-05,
+      "reduced_field_relative_error": 6.950920887674652e-05,
+      "max_power_relative_error": 3.479436530107067e-05,
+      "max_gradient_relative_error": 8.306145711855378e-05
+    },
+    {
+      "interval": 1,
+      "projected_prepare_sec": 4.5966232499995385,
+      "projected_diagnostics": {
+        "basis_rank": 710,
+        "boundary_residual": 0.0,
+        "basis_setup_time_sec": 0.48895850000553764,
+        "initial_field_relative_error": 0.08054300388633678,
+        "coefficient_power_ratio": 0.7943040492547389,
+        "expected_extinction_ratio": 0.7943282347242815,
+        "atmosphere_prepare_time_sec": 4.5947664589984925,
+        "atmosphere_integrations_this_interval": 1,
+        "ode_nfev": 10838,
+        "atmosphere_backend": "mps_projected_scipy_cpu_RK45",
+        "operator_dtype": "float32",
+        "ode_dtype": "complex128",
+        "operator_setup_time_sec": 0.18095808300131466,
+        "coefficient_evolution_time_sec": 4.58067016700079,
+        "operator_assembly_time_sec": 4.1211860769981286,
+        "ode_integration_time_sec": 0.39670012694841716,
+        "channel_sampling_time_sec": 0.06255199496081332,
+        "ode_solver": "scipy_RK45",
+        "boundary_transform": "fixed_Dirichlet_sine_projection",
+        "atmosphere_depends_on_fsm": false
+      },
+      "matrix_free_prepare_sec": 11.987524291995214,
+      "matrix_free_diagnostics": {
+        "basis_rank": 710,
+        "boundary_residual": 0.0,
+        "basis_setup_time_sec": 0.48975987500307383,
+        "initial_field_relative_error": 0.08054300388633678,
+        "coefficient_power_ratio": 0.7943040489695434,
+        "expected_extinction_ratio": 0.7943282347242815,
+        "atmosphere_prepare_time_sec": 11.97422083299898,
+        "atmosphere_integrations_this_interval": 1,
+        "ode_nfev": 10838,
+        "atmosphere_backend": "scipy_cpu_matrix_free_RK45",
+        "coefficient_evolution_time_sec": 11.960038875004102,
+        "operator_setup_time_sec": 0.0,
+        "ode_solver": "scipy_RK45",
+        "boundary_transform": "fixed_Dirichlet_sine_projection",
+        "atmosphere_depends_on_fsm": false
+      },
+      "coefficient_relative_error": 6.0672019373511114e-05,
+      "reduced_field_relative_error": 6.605661723121455e-05,
+      "max_power_relative_error": 2.0033383980557256e-05,
+      "max_gradient_relative_error": 0.00010922250362005571
+    }
+  ]
+}
