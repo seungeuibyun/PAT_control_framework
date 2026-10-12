@@ -1,0 +1,13 @@
+{
+  "collected_from": "Original testbed virtual environment; publication checks use the same environment",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "packages": {
+    "numpy": "2.5.3",
+    "scipy": "1.18.1",
+    "pyserial": "3.5",
+    "optoMDC": "1.3.5434",
+    "python-vxi11": "0.9",
+    "standard-xdrlib": "3.13.0"
+  },
+  "upstream_commit": "1192e7e92b885bfcb72e1c712948c8624cd3b3b5"
+}

@@ -1,0 +1,84 @@
+{
+  "started": "2026-10-12T22:55:48.089698+09:00",
+  "state": "aborted",
+  "source_commands_issued": false,
+  "stage_points": [],
+  "FSM_points": [],
+  "PINN_used": false,
+  "PSD_coordinates": "Unmodified native 1GP, mm",
+  "stage_scale_mm_per_native_unit": 9.921875e-05,
+  "new_geometry_calibrated": false,
+  "stage_radius_mm": 5.0,
+  "stage_only": true,
+  "positive_only": true,
+  "error": "RuntimeError('Zaber fault/reference warning: @01 0 OK IDLE WR 50946')",
+  "stage_restore_error": "Zaber fault/reference warning: @01 0 OK BUSY WR 0",
+  "finished": "2026-10-12T22:55:48.280461+09:00",
+  "final_state": {
+    "psd": {
+      "port": "COM4",
+      "connected": true,
+      "sample_count": 38184,
+      "identity": "1IDCONEX-PSD10-GE",
+      "x_mm": null,
+      "y_mm": null,
+      "relative_percent": 1.0,
+      "time": 1791813348.2633686,
+      "error": null,
+      "position_available": false,
+      "signal_state": "position_limit",
+      "edge_margin_mm": 0.0,
+      "age_s": 0.020821094512939453,
+      "raw_position_mm": [
+        0.3073,
+        5.0
+      ]
+    },
+    "fsm": {
+      "connected": true,
+      "control_available": true,
+      "port": "COM5",
+      "max_current_mA": 150.0,
+      "target_current_mA": [
+        0.0,
+        0.0
+      ],
+      "control_mode": "manual_current",
+      "target_xy": null,
+      "fault": null,
+      "automatic_search_active": false,
+      "time": 1791813348.2022264,
+      "sample_count": 18903,
+      "feedback_xy": [
+        0.04377411678433418,
+        0.03892103210091591
+      ],
+      "actual_current_mA": [
+        -0.6150116678327322,
+        -0.24786335416138172
+      ],
+      "applied_current_mA": [
+        0.0,
+        0.0
+      ],
+      "applied_xy": null,
+      "device_status": 0,
+      "operation_mode": 0,
+      "temperature_C": 28.0,
+      "moving": false,
+      "error": null,
+      "age_s": 0.11047887802124023
+    },
+    "pd": {
+      "connected": true,
+      "channel": "CH1",
+      "scope_ip": "192.168.10.2",
+      "scale_V_per_div": 0.1,
+      "mean_voltage_V": 0.03416388,
+      "time": 1791813348.1123946,
+      "error": null,
+      "identity": "RIGOL TECHNOLOGIES,MSO1104Z,DS1ZD190300117,00.04.04.SP1",
+      "age_s": 0.21561026573181152
+    }
+  }
+}

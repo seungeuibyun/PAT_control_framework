@@ -1,0 +1,2028 @@
+{
+  "started": "2026-10-12T01:12:54.543509+09:00",
+  "state": "real_PSD_FSM_closed_loop_verified",
+  "geometry_samples": [
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:12:57.167709+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.20356000000000002,
+        1.0151999999999999
+      ],
+      "PSD_std_mm": [
+        0.0016463292501805353,
+        0.0014696938456699143
+      ],
+      "FSM_feedback_xy": [
+        -0.009986682608723641,
+        0.052964811027050016
+      ],
+      "FSM_target_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "FSM_current_mA": [
+        20.86421847343445,
+        -2.430155873298645
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:12:59.252695+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.056226,
+        1.015
+      ],
+      "PSD_std_mm": [
+        0.002569020046632568,
+        0.0025298221281346883
+      ],
+      "FSM_feedback_xy": [
+        -0.008957931585609914,
+        0.05294019877910614
+      ],
+      "FSM_target_xy": [
+        -0.00898586526734797,
+        0.05297425448079397
+      ],
+      "FSM_current_mA": [
+        4.71156183630228,
+        -3.4347032196819782
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:13:01.595730+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.4697,
+        1.0196
+      ],
+      "PSD_std_mm": [
+        0.0019110206696945928,
+        0.002416609194718946
+      ],
+      "FSM_feedback_xy": [
+        -0.011044955812394619,
+        0.05304392129182815
+      ],
+      "FSM_target_xy": [
+        -0.010985865267347971,
+        0.05297425448079397
+      ],
+      "FSM_current_mA": [
+        31.828638166189194,
+        -3.6425404250621796
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:13:04.152856+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.22121999999999997,
+        1.0121999999999998
+      ],
+      "PSD_std_mm": [
+        0.003862848689762514,
+        0.002638181191654549
+      ],
+      "FSM_feedback_xy": [
+        -0.01002442166209221,
+        0.05296692028641701
+      ],
+      "FSM_target_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "FSM_current_mA": [
+        7.755318656563759,
+        -1.7720041796565056
+      ],
+      "PSD_percent": 14.2
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:13:06.062306+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.2024,
+        0.8363800000000001
+      ],
+      "PSD_std_mm": [
+        0.0030073243922131166,
+        0.001274990196040747
+      ],
+      "FSM_feedback_xy": [
+        -0.00995437242090702,
+        0.054019030183553696
+      ],
+      "FSM_target_xy": [
+        -0.00998586526734797,
+        0.05397425448079397
+      ],
+      "FSM_current_mA": [
+        8.308728225529194,
+        -14.4500732421875
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:13:08.468145+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.22322000000000003,
+        1.1898
+      ],
+      "PSD_std_mm": [
+        0.003413736955302801,
+        0.0017204650534084957
+      ],
+      "FSM_feedback_xy": [
+        -0.010021630302071571,
+        0.05191503912210464
+      ],
+      "FSM_target_xy": [
+        -0.00998586526734797,
+        0.05197425448079397
+      ],
+      "FSM_current_mA": [
+        8.135788142681122,
+        11.668157763779163
+      ],
+      "PSD_percent": 14.6
+    },
+    {
+      "label": "local_axis_probe",
+      "time": "2026-10-12T01:13:10.755664+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.20404,
+        1.0217999999999998
+      ],
+      "PSD_std_mm": [
+        0.0015768322675541642,
+        0.0027856776554368136
+      ],
+      "FSM_feedback_xy": [
+        -0.009954566881060601,
+        0.05294409543275833
+      ],
+      "FSM_target_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "FSM_current_mA": [
+        7.928258739411831,
+        -10.639727115631104
+      ],
+      "PSD_percent": 14.2
+    }
+  ],
+  "center_calibration_samples": [
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:22.660720+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.7820400000000001,
+        0.53594
+      ],
+      "PSD_std_mm": [
+        0.0039077359173823375,
+        0.0016426807358704847
+      ],
+      "FSM_feedback_xy": [
+        -0.012293931841850281,
+        0.05603987649083138
+      ],
+      "FSM_target_xy": [
+        -0.012165597148239612,
+        0.05604249846935272
+      ],
+      "FSM_current_mA": [
+        19.68822255730629,
+        -7.4528902769088745
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:24.499508+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.38154000000000005,
+        0.52134
+      ],
+      "PSD_std_mm": [
+        0.005153872330587947,
+        0.0030624173458233856
+      ],
+      "FSM_feedback_xy": [
+        -0.010668332129716874,
+        0.05601385235786438
+      ],
+      "FSM_target_xy": [
+        -0.010665597148239612,
+        0.05604249846935272
+      ],
+      "FSM_current_mA": [
+        4.988267086446285,
+        -8.977030403912067
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:25.686442+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.026282000000000007,
+        0.51494
+      ],
+      "PSD_std_mm": [
+        0.0034418797189907724,
+        0.004033162530818696
+      ],
+      "FSM_feedback_xy": [
+        -0.009073038399219514,
+        0.056005702912807466
+      ],
+      "FSM_target_xy": [
+        -0.009165597148239613,
+        0.05604249846935272
+      ],
+      "FSM_current_mA": [
+        6.302617024630308,
+        -10.085494257509708
+      ],
+      "PSD_percent": 14.6
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:26.991763+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.38936000000000004,
+        0.51136
+      ],
+      "PSD_std_mm": [
+        0.002229439391416602,
+        0.0012043255373859452
+      ],
+      "FSM_feedback_xy": [
+        -0.007586186472326517,
+        0.05601344257593155
+      ],
+      "FSM_target_xy": [
+        -0.007665597148239612,
+        0.05604249846935272
+      ],
+      "FSM_current_mA": [
+        6.544733885675669,
+        -12.129225768148899
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:28.317101+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.74454,
+        0.51644
+      ],
+      "PSD_std_mm": [
+        0.0021675792949740224,
+        0.004124366618039671
+      ],
+      "FSM_feedback_xy": [
+        -0.006081849988549948,
+        0.05600793808698654
+      ],
+      "FSM_target_xy": [
+        -0.0061655971482396125,
+        0.05604249846935272
+      ],
+      "FSM_current_mA": [
+        6.198851857334375,
+        -11.886749416589737
+      ],
+      "PSD_percent": 16.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:30.058550+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.73148,
+        0.25462
+      ],
+      "PSD_std_mm": [
+        0.002579457307264475,
+        0.0014510685717773557
+      ],
+      "FSM_feedback_xy": [
+        -0.00614751148968935,
+        0.05760519206523895
+      ],
+      "FSM_target_xy": [
+        -0.0061655971482396125,
+        0.05754249846935272
+      ],
+      "FSM_current_mA": [
+        7.616966031491756,
+        -22.79818430542946
+      ],
+      "PSD_percent": 16.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:32.617223+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.36038,
+        0.24808
+      ],
+      "PSD_std_mm": [
+        0.0022506887834616296,
+        0.0015638414241859726
+      ],
+      "FSM_feedback_xy": [
+        -0.007718200422823429,
+        0.05759584009647369
+      ],
+      "FSM_target_xy": [
+        -0.007665597148239612,
+        0.05754249846935272
+      ],
+      "FSM_current_mA": [
+        28.335245326161385,
+        -18.156496807932854
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:33.957123+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.04245800000000001,
+        0.2518
+      ],
+      "PSD_std_mm": [
+        0.0019304755890712517,
+        0.002623737791777211
+      ],
+      "FSM_feedback_xy": [
+        -0.009318603575229645,
+        0.05757578238844872
+      ],
+      "FSM_target_xy": [
+        -0.009165597148239613,
+        0.05754249846935272
+      ],
+      "FSM_current_mA": [
+        26.29454992711544,
+        -17.2558706253767
+      ],
+      "PSD_percent": 14.4
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:35.410099+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.38632,
+        0.26052
+      ],
+      "PSD_std_mm": [
+        0.0014743133995185728,
+        0.002435077000835906
+      ],
+      "FSM_feedback_xy": [
+        -0.010749864205718041,
+        0.05757536366581917
+      ],
+      "FSM_target_xy": [
+        -0.010665597148239612,
+        0.05754249846935272
+      ],
+      "FSM_current_mA": [
+        29.511239379644394,
+        -15.558537095785141
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:36.596539+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.78284,
+        0.26861999999999997
+      ],
+      "PSD_std_mm": [
+        0.0018478095139921624,
+        0.0029579722784367096
+      ],
+      "FSM_feedback_xy": [
+        -0.012331542186439037,
+        0.057572074234485626
+      ],
+      "FSM_target_xy": [
+        -0.012165597148239612,
+        0.05754249846935272
+      ],
+      "FSM_current_mA": [
+        28.50818634033203,
+        -14.796467497944832
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:38.321496+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.75492,
+        0.0072542
+      ],
+      "PSD_std_mm": [
+        0.003566174420860517,
+        0.0017686057107224326
+      ],
+      "FSM_feedback_xy": [
+        -0.012216443568468094,
+        0.0591867744922638
+      ],
+      "FSM_target_xy": [
+        -0.012165597148239612,
+        0.05904249846935272
+      ],
+      "FSM_current_mA": [
+        26.29454992711544,
+        -22.17467501759529
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:40.329325+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.37078,
+        0.019962
+      ],
+      "PSD_std_mm": [
+        0.008001349886112974,
+        0.002453792167238293
+      ],
+      "FSM_feedback_xy": [
+        -0.01065202448517084,
+        0.05903096422553063
+      ],
+      "FSM_target_xy": [
+        -0.010665597148239612,
+        0.05904249846935272
+      ],
+      "FSM_current_mA": [
+        6.613909732550383,
+        -20.51198109984398
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:41.470242+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.018504,
+        0.020194
+      ],
+      "PSD_std_mm": [
+        0.0019738652436273357,
+        0.0016074402010650354
+      ],
+      "FSM_feedback_xy": [
+        -0.009081145375967025,
+        0.05899410769343376
+      ],
+      "FSM_target_xy": [
+        -0.009165597148239613,
+        0.05904249846935272
+      ],
+      "FSM_current_mA": [
+        7.478613406419754,
+        -21.585801616311073
+      ],
+      "PSD_percent": 14.6
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:42.623430+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.3758,
+        0.024426
+      ],
+      "PSD_std_mm": [
+        0.000782304288624314,
+        0.0010257602058960952
+      ],
+      "FSM_feedback_xy": [
+        -0.0076137598603963855,
+        0.058930692821741106
+      ],
+      "FSM_target_xy": [
+        -0.007665597148239612,
+        0.05904249846935272
+      ],
+      "FSM_current_mA": [
+        6.198851857334375,
+        -23.69881048798561
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:43.828388+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.7507199999999999,
+        0.009894
+      ],
+      "PSD_std_mm": [
+        0.002574800963181418,
+        0.0029898551135464743
+      ],
+      "FSM_feedback_xy": [
+        -0.006081887893378735,
+        0.05903796032071114
+      ],
+      "FSM_target_xy": [
+        -0.0061655971482396125,
+        0.05904249846935272
+      ],
+      "FSM_current_mA": [
+        6.025911774486303,
+        -24.980466812849045
+      ],
+      "PSD_percent": 16.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:45.737628+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.72824,
+        -0.2406
+      ],
+      "PSD_std_mm": [
+        0.0014093970341958234,
+        0.001627267648544642
+      ],
+      "FSM_feedback_xy": [
+        -0.006167266052216291,
+        0.06059551388025284
+      ],
+      "FSM_target_xy": [
+        -0.0061655971482396125,
+        0.060542498469352724
+      ],
+      "FSM_current_mA": [
+        6.786850746721029,
+        -11.471075005829334
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:48.875961+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.36048,
+        -0.24412000000000003
+      ],
+      "PSD_std_mm": [
+        0.002260442434568956,
+        0.0011668761716651893
+      ],
+      "FSM_feedback_xy": [
+        -0.007713279128074646,
+        0.060529055446386336
+      ],
+      "FSM_target_xy": [
+        -0.007665597148239612,
+        0.060542498469352724
+      ],
+      "FSM_current_mA": [
+        26.81337110698223,
+        -12.406342662870884
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:50.071154+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.013266,
+        -0.23653999999999997
+      ],
+      "PSD_std_mm": [
+        0.0010949082153313126,
+        0.001703643155123751
+      ],
+      "FSM_feedback_xy": [
+        -0.009261102229356766,
+        0.06055802553892135
+      ],
+      "FSM_target_xy": [
+        -0.009165597148239613,
+        0.060542498469352724
+      ],
+      "FSM_current_mA": [
+        27.50513330101967,
+        -11.990667320787907
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:51.384475+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.39,
+        -0.22568000000000002
+      ],
+      "PSD_std_mm": [
+        0.0031432467291003297,
+        0.004231500915750817
+      ],
+      "FSM_feedback_xy": [
+        -0.010745237208902835,
+        0.060527123510837555
+      ],
+      "FSM_target_xy": [
+        -0.010665597148239612,
+        0.060542498469352724
+      ],
+      "FSM_current_mA": [
+        29.6150054782629,
+        -10.98612230271101
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:53.222549+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.77968,
+        -0.21626000000000004
+      ],
+      "PSD_std_mm": [
+        0.0033246954747766155,
+        0.002069396047159659
+      ],
+      "FSM_feedback_xy": [
+        -0.012329856120049953,
+        0.06051360368728638
+      ],
+      "FSM_target_xy": [
+        -0.012165597148239612,
+        0.060542498469352724
+      ],
+      "FSM_current_mA": [
+        25.464436039328575,
+        -11.26323826611042
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:55.013225+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.7627200000000001,
+        -0.48645999999999995
+      ],
+      "PSD_std_mm": [
+        0.0024967178454923574,
+        0.002509661331733839
+      ],
+      "FSM_feedback_xy": [
+        -0.012229090370237828,
+        0.06213432252407074
+      ],
+      "FSM_target_xy": [
+        -0.012165597148239612,
+        0.062042498469352725
+      ],
+      "FSM_current_mA": [
+        21.93645015358925,
+        -25.915730744600296
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:56.855188+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        -0.36094,
+        -0.47722
+      ],
+      "PSD_std_mm": [
+        0.0033446076003023134,
+        0.001843257985199039
+      ],
+      "FSM_feedback_xy": [
+        -0.010628810524940491,
+        0.06205003708600998
+      ],
+      "FSM_target_xy": [
+        -0.010665597148239612,
+        0.062042498469352725
+      ],
+      "FSM_current_mA": [
+        7.409437093883753,
+        -24.218399077653885
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:57.971189+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.017929999999999998,
+        -0.47862
+      ],
+      "PSD_std_mm": [
+        0.0025240839922633313,
+        0.001866976164818385
+      ],
+      "FSM_feedback_xy": [
+        -0.009104929864406586,
+        0.06201455518603325
+      ],
+      "FSM_target_xy": [
+        -0.009165597148239613,
+        0.062042498469352725
+      ],
+      "FSM_current_mA": [
+        8.412492461502552,
+        -24.66871403157711
+      ],
+      "PSD_percent": 14.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:13:59.293847+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.3766,
+        -0.48538000000000003
+      ],
+      "PSD_std_mm": [
+        0.002829840984931846,
+        0.0034556620205106903
+      ],
+      "FSM_feedback_xy": [
+        -0.00761453490704298,
+        0.06203269511461258
+      ],
+      "FSM_target_xy": [
+        -0.007665597148239612,
+        0.062042498469352725
+      ],
+      "FSM_current_mA": [
+        5.783794913440943,
+        -25.04974789917469
+      ],
+      "PSD_percent": 15.0
+    },
+    {
+      "label": "center_ray_map",
+      "time": "2026-10-12T01:14:00.492773+09:00",
+      "independent_PSD_sample_count": 5,
+      "PSD_mm": [
+        0.7457,
+        -0.47982
+      ],
+      "PSD_std_mm": [
+        0.002234278407002999,
+        0.0007054076835419353
+      ],
+      "FSM_feedback_xy": [
+        -0.00607831496745348,
+        0.062061616033315656
+      ],
+      "FSM_target_xy": [
+        -0.0061655971482396125,
+        0.062042498469352725
+      ],
+      "FSM_current_mA": [
+        6.06049969792366,
+        -25.46541951596737
+      ],
+      "PSD_percent": 16.0
+    }
+  ],
+  "feedback_samples": [
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:10.765258+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.2092,
+        1.016
+      ],
+      "error_norm_mm": 1.0373141472090315,
+      "FSM_feedback_xy": [
+        -0.009965412318706512,
+        0.0530012808740139
+      ],
+      "next_xy": [
+        -0.009771887018280027,
+        0.05448874447292812
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:11.884015+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.154,
+        0.769
+      ],
+      "error_norm_mm": 0.7842684489382447,
+      "FSM_feedback_xy": [
+        -0.009782401844859123,
+        0.05443365499377251
+      ],
+      "next_xy": [
+        -0.009594461317419636,
+        0.05592183453876893
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:13.288626+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.09988,
+        0.5033
+      ],
+      "error_norm_mm": 0.5131149037009157,
+      "FSM_feedback_xy": [
+        -0.009603341110050678,
+        0.05597688630223274
+      ],
+      "next_xy": [
+        -0.009417192118006564,
+        0.05746529100283032
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:15.220695+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.06473,
+        0.2445
+      ],
+      "error_norm_mm": 0.25292335380506087,
+      "FSM_feedback_xy": [
+        -0.009423463605344296,
+        0.057614076882600784
+      ],
+      "next_xy": [
+        -0.009239383938012562,
+        0.05869704397359625
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:16.615049+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.01476,
+        0.03232
+      ],
+      "error_norm_mm": 0.03553083168179434,
+      "FSM_feedback_xy": [
+        -0.00920340046286583,
+        0.05887526646256447
+      ],
+      "next_xy": [
+        -0.009160597588341904,
+        0.059017265287041154
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:17.233108+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.0133,
+        0.03015
+      ],
+      "error_norm_mm": 0.032953186492356096,
+      "FSM_feedback_xy": [
+        -0.009193959645926952,
+        0.0588996559381485
+      ],
+      "next_xy": [
+        -0.009155426961379397,
+        0.05903220824729015
+      ]
+    },
+    {
+      "label": "center_acquisition",
+      "time": "2026-10-12T01:13:17.834028+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        -0.005501,
+        0.01289
+      ],
+      "error_norm_mm": 0.014014745841434301,
+      "FSM_feedback_xy": [
+        -0.009165597148239613,
+        0.05904249846935272
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:00.503217+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.7425,
+        -0.4796
+      ],
+      "error_norm_mm": 0.883924436815727,
+      "FSM_feedback_xy": [
+        -0.006079364567995071,
+        0.06205414608120918
+      ],
+      "next_xy": [
+        -0.007170705497428596,
+        0.06102508098329595
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:03.668865+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.5128,
+        -0.3107
+      ],
+      "error_norm_mm": 0.5995817959211237,
+      "FSM_feedback_xy": [
+        -0.007112280931323767,
+        0.06101572886109352
+      ],
+      "next_xy": [
+        -0.008236445033847961,
+        0.06002262510488475
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:04.780805+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.2115,
+        -0.1476
+      ],
+      "error_norm_mm": 0.2579108566927728,
+      "FSM_feedback_xy": [
+        -0.008320735767483711,
+        0.05993710085749626
+      ],
+      "next_xy": [
+        -0.008965757255064941,
+        0.05927906280637935
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:06.173812+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.02285,
+        -0.04014
+      ],
+      "error_norm_mm": 0.046188116437023065,
+      "FSM_feedback_xy": [
+        -0.009083121083676815,
+        0.059329576790332794
+      ],
+      "next_xy": [
+        -0.009152633779156002,
+        0.05914893143315396
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:06.756810+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.02379,
+        -0.02176
+      ],
+      "error_norm_mm": 0.03224068392574823,
+      "FSM_feedback_xy": [
+        -0.009083496406674385,
+        0.05920855700969696
+      ],
+      "next_xy": [
+        -0.009156012789063382,
+        0.05911118492628882
+      ]
+    },
+    {
+      "label": "center_return",
+      "time": "2026-10-12T01:14:07.398696+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.01902,
+        -0.008634
+      ],
+      "error_norm_mm": 0.020887947625365205,
+      "FSM_feedback_xy": [
+        -0.009077814407646656,
+        0.05909378454089165
+      ]
+    },
+    {
+      "label": "final_center_hold",
+      "time": "2026-10-12T01:14:07.405475+09:00",
+      "reference_PSD_mm": [
+        0.0,
+        0.0
+      ],
+      "actual_PSD_mm": [
+        0.01902,
+        -0.008634
+      ],
+      "error_norm_mm": 0.020887947625365205,
+      "FSM_feedback_xy": [
+        -0.009077814407646656,
+        0.05909378454089165
+      ]
+    }
+  ],
+  "source_or_stage_commands": false,
+  "test_controller": "measured_two_axis_ray_geometry_feedback",
+  "PINN_active": false,
+  "PD_alignment_required_for_this_test": false,
+  "source": {
+    "current_mA": 32,
+    "power_dBm": 2.43,
+    "temperature_C": 24.8,
+    "raw_reply": "OPTILAB, LLC.\nModel Number: DFB-SM-M-1560-25\nSerial Number: H14423462513\nFW Version: v3.9.1\nDevice ID: 01\nSet Current: 0032 mA\nProtect Current: 0230 mA\nAbs MAX Current: 0250 mA\nOptical Power: 02.43 dBm\nSet Temperature: 25.0 C\nSet Temp Range: 15.0 - 35.0 C\nMonitor Temp: 24.8 C\r\n"
+  },
+  "initial_state": {
+    "ui_revision": "fsm-manual-2",
+    "host": "DESKTOP-UGDPVQ3",
+    "source_ip": "192.168.0.30",
+    "requested_monitor_pc": "192.168.0.36",
+    "psd": {
+      "port": "COM4",
+      "connected": true,
+      "sample_count": 311912,
+      "identity": "1IDCONEX-PSD10-GE",
+      "x_mm": -0.2035,
+      "y_mm": 1.017,
+      "relative_percent": 15.0,
+      "time": 1791735176.2485495,
+      "error": null,
+      "position_available": true,
+      "signal_state": "measuring",
+      "edge_margin_mm": 3.983,
+      "age_s": 0.05079960823059082
+    },
+    "fsm": {
+      "connected": true,
+      "control_available": true,
+      "port": "COM5",
+      "max_current_mA": 150.0,
+      "target_current_mA": [
+        0.0,
+        0.0
+      ],
+      "control_mode": "device_xy_servo",
+      "target_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "fault": null,
+      "automatic_search_active": true,
+      "time": 1791735176.2391574,
+      "sample_count": 153926,
+      "feedback_xy": [
+        -0.009978489018976688,
+        0.0529533214867115
+      ],
+      "actual_current_mA": [
+        21.452216431498528,
+        -2.6379935443401337
+      ],
+      "applied_current_mA": [
+        0.0,
+        0.0
+      ],
+      "applied_xy": [
+        -0.009985865093767643,
+        0.05297425389289856
+      ],
+      "device_status": 16,
+      "operation_mode": 2,
+      "temperature_C": 28.375,
+      "moving": false,
+      "error": null,
+      "age_s": 0.06019163131713867
+    },
+    "pd": {
+      "connected": true,
+      "channel": "CH1",
+      "scope_ip": "192.168.10.2",
+      "scale_V_per_div": 2.0,
+      "mean_voltage_V": 0.16,
+      "time": 1791735175.836603,
+      "error": null,
+      "identity": "RIGOL TECHNOLOGIES,MSO1104Z,DS1ZD190300117,00.04.04.SP1",
+      "age_s": 0.46274614334106445
+    },
+    "calibration": {
+      "electrical_dark": true,
+      "pd_reference": false,
+      "fsm_mapping": true,
+      "PSD_feedback_loop_active": false,
+      "PSD_feedback_controller": "none_fixed_FSM_pose",
+      "PSD_trajectory": "hold",
+      "FSM_to_PSD_mapping": {
+        "G_mm_per_xy": [
+          [
+            249.82317017422264,
+            1.751445417502595
+          ],
+          [
+            -4.07544511987529,
+            -165.14476132282329
+          ]
+        ],
+        "feedback_center_xy": [
+          -0.01002730568870902,
+          0.053103831463626454
+        ],
+        "PSD_center_mm": [
+          -0.030613142857142856,
+          0.003428671333333326
+        ],
+        "fit_rms_mm": 0.003427728940283712,
+        "artifact": "FSM_PSD_causal_verification_20261011.json",
+        "meaning": "Actual internal mirror sensor feedback converted into calibrated PSD mm coordinates"
+      },
+      "activity": "Preparing measured local Frozen-PINN PSD/FSM calibration",
+      "PSD_reference_path_mm": [],
+      "PINN_active": false,
+      "PSD_display_epoch": "2026-10-11T21:01:07.140432+09:00",
+      "FSM_direction_results": [
+        {
+          "label": "기준 위치",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            0.0,
+            0.0
+          ],
+          "PSD_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "label": "X+",
+          "command_xy": [
+            0.002,
+            0.0
+          ],
+          "actual_xy": [
+            0.0020086,
+            -6.4e-06
+          ],
+          "PSD_mm": [
+            0.50908,
+            -0.01351
+          ]
+        },
+        {
+          "label": "X−",
+          "command_xy": [
+            -0.002,
+            0.0
+          ],
+          "actual_xy": [
+            -0.0020509,
+            -5.1e-06
+          ],
+          "PSD_mm": [
+            -0.51124,
+            0.00233
+          ]
+        },
+        {
+          "label": "X 시험 후 복귀",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            2e-07,
+            -5.61e-05
+          ],
+          "PSD_mm": [
+            0.00047,
+            0.0058
+          ]
+        },
+        {
+          "label": "Y+",
+          "command_xy": [
+            0.0,
+            0.002
+          ],
+          "actual_xy": [
+            2.7e-06,
+            0.0020344
+          ],
+          "PSD_mm": [
+            0.00638,
+            -0.33186
+          ]
+        },
+        {
+          "label": "Y−",
+          "command_xy": [
+            0.0,
+            -0.002
+          ],
+          "actual_xy": [
+            6.7e-06,
+            -0.0020736
+          ],
+          "PSD_mm": [
+            0.00149,
+            0.33318
+          ]
+        },
+        {
+          "label": "최종 복귀",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            1.4e-06,
+            2.17e-05
+          ],
+          "PSD_mm": [
+            -0.00093,
+            -0.00324
+          ]
+        }
+      ],
+      "raw_trajectory_origin_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "raw_trajectory_active": false,
+      "raw_trajectory_epoch": "2026-10-11T23:55:17.004355+09:00",
+      "raw_trajectory_started_time": null,
+      "raw_trajectory_statistics": null,
+      "raw_trajectory_amplitude_xy": [
+        0.0,
+        0.0
+      ],
+      "raw_trajectory_requested_PSD_half_range_mm": 0.0,
+      "raw_trajectory_shape": "hold",
+      "raw_trajectory_command_label": "PSD 중앙 고정 · PD 수동 정렬 준비",
+      "raw_trajectory_optical_half_range_mrad": null,
+      "PSD_center_hold_artifact": "PSD_center_hold_20261011_235517.json",
+      "PD_voltage_conversion": {
+        "model": "PDA015C2",
+        "wavelength_nm": 1562,
+        "responsivity_reference_wavelength_nm": 1550,
+        "responsivity_A_per_W": 0.95,
+        "gain_high_z_V_per_A": 50000.0,
+        "gain_50ohm_V_per_A": 25000.0,
+        "default_load": "high_z",
+        "dark_voltage_V": 0.033988462,
+        "absolute_optical_power_calibrated": false,
+        "scope_DC_verified": true,
+        "scope_direct_BNC_probe_ratio_verified": true,
+        "default_display_unit": "dBm",
+        "specification_source": "https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=4&pn=PDA015C2"
+      },
+      "planned_optical_reconfiguration": {
+        "reported": "2026-10-12T00:12:29.273199+09:00",
+        "state": "planned_by_user_installation_not_yet_confirmed_complete",
+        "source_payload": "Laser-fed collimator on the Zaber X-linear stage",
+        "source_stage_motion": "Independent transmitter disturbance",
+        "receiver_sequence": [
+          "Beam expander",
+          "Optotune FSM",
+          "Beam splitter"
+        ],
+        "detector_branches": [
+          "Newport CONEX-PSD10GE",
+          "Thorlabs PDA015C2 -> RIGOL CH1"
+        ],
+        "beam_expander_model_confirmed": false,
+        "beam_expander_magnification_confirmed": false,
+        "requires_after_installation": [
+          "Verify receiver illumination and beam footprint at FSM",
+          "Recheck the empirical FSM-to-native-PSD mapping over the new operating range",
+          "Recheck native PSD center versus actual unsaturated PD maximum"
+        ],
+        "previous_mapping_automatically_reused": false
+      },
+      "Zaber_connection": {
+        "checked": "2026-10-12T00:25:24.693508+09:00",
+        "candidate_port": "COM6",
+        "USB_converter_serial": "A10PSNGVA",
+        "USB_converter_driver_status": "OK",
+        "USB_converter_detected": true,
+        "device_communication_verified": false,
+        "device_model_verified": false,
+        "position_available": false,
+        "position_mm": null,
+        "motion_commands_issued": false,
+        "homing_commands_issued": false,
+        "verification_artifact": "Zaber_USB_verification_20261012_002025.json",
+        "state": "USB_converter_ready_device_response_pending"
+      },
+      "PD_GUI_verification_artifact": "PD_current_GUI_verification_20261012.json",
+      "PD_peak_readout_displayed": false,
+      "PD_power_readout_source": "current_CH1_VAVG_sample",
+      "PINN_deferred_by_user": false,
+      "Zaber_deferred_for_current_session": true
+    },
+    "viewers": {
+      "192.168.0.36": "2026-10-12T01:12:56.217184+09:00",
+      "127.0.0.1": "2026-10-12T01:12:56.298867+09:00"
+    },
+    "legacy_gui": "PAT/PAT/FSM_PSD/conex_pat_modules/simple_gui.py",
+    "server_time": "2026-10-12T01:12:56.299330+09:00"
+  },
+  "initial_geometry_mm_per_xy": [
+    [
+      252.02847959268837,
+      1.9891475339986118
+    ],
+    [
+      -10.49160336061055,
+      -167.5431420328928
+    ]
+  ],
+  "initial_geometry_rms_mm": 0.004108256714463674,
+  "center_feedback_xy": [
+    -0.009165597148239613,
+    0.05904249846935272
+  ],
+  "center_geometry_mm_per_xy": [
+    [
+      245.52415599385367,
+      0.3900134092292022
+    ],
+    [
+      -2.644962345485933,
+      -165.6347110449302
+    ]
+  ],
+  "center_geometry_rms_mm": 0.006002631379747537,
+  "reference_tracking_RMS_mm": null,
+  "maximum_settled_tracking_error_mm": null,
+  "circle_verification_performed": false,
+  "physical_PSD_center_hold_verified": true,
+  "source_stage_position_used": false,
+  "absolute_PSD_coordinate_accuracy_verified": false,
+  "handoff": {
+    "accepted": true,
+    "target_current_mA": [
+      0.0,
+      0.0
+    ],
+    "monitor_ip": "192.168.0.36"
+  },
+  "final_state": {
+    "ui_revision": "fsm-manual-2",
+    "host": "DESKTOP-UGDPVQ3",
+    "source_ip": "192.168.0.30",
+    "requested_monitor_pc": "192.168.0.36",
+    "psd": {
+      "port": "COM4",
+      "connected": true,
+      "sample_count": 313065,
+      "identity": "1IDCONEX-PSD10-GE",
+      "x_mm": 0.01902,
+      "y_mm": -0.008634,
+      "relative_percent": 14.0,
+      "time": 1791735247.3689723,
+      "error": null,
+      "position_available": true,
+      "signal_state": "measuring",
+      "edge_margin_mm": 4.98098,
+      "age_s": 0.061933279037475586
+    },
+    "fsm": {
+      "connected": true,
+      "control_available": true,
+      "port": "COM5",
+      "max_current_mA": 150.0,
+      "target_current_mA": [
+        0.0,
+        0.0
+      ],
+      "control_mode": "device_xy_servo",
+      "target_xy": [
+        -0.009156012789063382,
+        0.05911118492628882
+      ],
+      "fault": null,
+      "automatic_search_active": false,
+      "time": 1791735247.3640964,
+      "sample_count": 154499,
+      "feedback_xy": [
+        -0.009077814407646656,
+        0.05909378454089165
+      ],
+      "actual_current_mA": [
+        28.05854193866253,
+        -1.7720041796565056
+      ],
+      "applied_current_mA": [
+        0.0,
+        0.0
+      ],
+      "applied_xy": [
+        -0.009156012907624245,
+        0.05911118537187576
+      ],
+      "device_status": 16,
+      "operation_mode": 2,
+      "temperature_C": 28.375,
+      "moving": false,
+      "error": null,
+      "age_s": 0.06680917739868164
+    },
+    "pd": {
+      "connected": true,
+      "channel": "CH1",
+      "scope_ip": "192.168.10.2",
+      "scale_V_per_div": 2.0,
+      "mean_voltage_V": 2.719131,
+      "time": 1791735246.7956104,
+      "error": null,
+      "identity": "RIGOL TECHNOLOGIES,MSO1104Z,DS1ZD190300117,00.04.04.SP1",
+      "age_s": 0.6352951526641846
+    },
+    "calibration": {
+      "electrical_dark": true,
+      "pd_reference": false,
+      "fsm_mapping": true,
+      "PSD_feedback_loop_active": false,
+      "PSD_feedback_controller": "none_fixed_FSM_pose",
+      "PSD_trajectory": "hold",
+      "FSM_to_PSD_mapping": {
+        "G_mm_per_xy": [
+          [
+            249.82317017422264,
+            1.751445417502595
+          ],
+          [
+            -4.07544511987529,
+            -165.14476132282329
+          ]
+        ],
+        "feedback_center_xy": [
+          -0.01002730568870902,
+          0.053103831463626454
+        ],
+        "PSD_center_mm": [
+          -0.030613142857142856,
+          0.003428671333333326
+        ],
+        "fit_rms_mm": 0.003427728940283712,
+        "artifact": "FSM_PSD_causal_verification_20261011.json",
+        "meaning": "Actual internal mirror sensor feedback converted into calibrated PSD mm coordinates"
+      },
+      "activity": "Preparing measured local Frozen-PINN PSD/FSM calibration",
+      "PSD_reference_path_mm": [],
+      "PINN_active": false,
+      "PSD_display_epoch": "2026-10-11T21:01:07.140432+09:00",
+      "FSM_direction_results": [
+        {
+          "label": "기준 위치",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            0.0,
+            0.0
+          ],
+          "PSD_mm": [
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "label": "X+",
+          "command_xy": [
+            0.002,
+            0.0
+          ],
+          "actual_xy": [
+            0.0020086,
+            -6.4e-06
+          ],
+          "PSD_mm": [
+            0.50908,
+            -0.01351
+          ]
+        },
+        {
+          "label": "X−",
+          "command_xy": [
+            -0.002,
+            0.0
+          ],
+          "actual_xy": [
+            -0.0020509,
+            -5.1e-06
+          ],
+          "PSD_mm": [
+            -0.51124,
+            0.00233
+          ]
+        },
+        {
+          "label": "X 시험 후 복귀",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            2e-07,
+            -5.61e-05
+          ],
+          "PSD_mm": [
+            0.00047,
+            0.0058
+          ]
+        },
+        {
+          "label": "Y+",
+          "command_xy": [
+            0.0,
+            0.002
+          ],
+          "actual_xy": [
+            2.7e-06,
+            0.0020344
+          ],
+          "PSD_mm": [
+            0.00638,
+            -0.33186
+          ]
+        },
+        {
+          "label": "Y−",
+          "command_xy": [
+            0.0,
+            -0.002
+          ],
+          "actual_xy": [
+            6.7e-06,
+            -0.0020736
+          ],
+          "PSD_mm": [
+            0.00149,
+            0.33318
+          ]
+        },
+        {
+          "label": "최종 복귀",
+          "command_xy": [
+            0.0,
+            0.0
+          ],
+          "actual_xy": [
+            1.4e-06,
+            2.17e-05
+          ],
+          "PSD_mm": [
+            -0.00093,
+            -0.00324
+          ]
+        }
+      ],
+      "raw_trajectory_origin_xy": [
+        -0.00998586526734797,
+        0.05297425448079397
+      ],
+      "raw_trajectory_active": false,
+      "raw_trajectory_epoch": "2026-10-11T23:55:17.004355+09:00",
+      "raw_trajectory_started_time": null,
+      "raw_trajectory_statistics": null,
+      "raw_trajectory_amplitude_xy": [
+        0.0,
+        0.0
+      ],
+      "raw_trajectory_requested_PSD_half_range_mm": 0.0,
+      "raw_trajectory_shape": "hold",
+      "raw_trajectory_command_label": "PSD 중앙 고정 · PD 수동 정렬 준비",
+      "raw_trajectory_optical_half_range_mrad": null,
+      "PSD_center_hold_artifact": "PSD_center_hold_20261011_235517.json",
+      "PD_voltage_conversion": {
+        "model": "PDA015C2",
+        "wavelength_nm": 1562,
+        "responsivity_reference_wavelength_nm": 1550,
+        "responsivity_A_per_W": 0.95,
+        "gain_high_z_V_per_A": 50000.0,
+        "gain_50ohm_V_per_A": 25000.0,
+        "default_load": "high_z",
+        "dark_voltage_V": 0.033988462,
+        "absolute_optical_power_calibrated": false,
+        "scope_DC_verified": true,
+        "scope_direct_BNC_probe_ratio_verified": true,
+        "default_display_unit": "dBm",
+        "specification_source": "https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=4&pn=PDA015C2"
+      },
+      "planned_optical_reconfiguration": {
+        "reported": "2026-10-12T00:12:29.273199+09:00",
+        "state": "planned_by_user_installation_not_yet_confirmed_complete",
+        "source_payload": "Laser-fed collimator on the Zaber X-linear stage",
+        "source_stage_motion": "Independent transmitter disturbance",
+        "receiver_sequence": [
+          "Beam expander",
+          "Optotune FSM",
+          "Beam splitter"
+        ],
+        "detector_branches": [
+          "Newport CONEX-PSD10GE",
+          "Thorlabs PDA015C2 -> RIGOL CH1"
+        ],
+        "beam_expander_model_confirmed": false,
+        "beam_expander_magnification_confirmed": false,
+        "requires_after_installation": [
+          "Verify receiver illumination and beam footprint at FSM",
+          "Recheck the empirical FSM-to-native-PSD mapping over the new operating range",
+          "Recheck native PSD center versus actual unsaturated PD maximum"
+        ],
+        "previous_mapping_automatically_reused": false
+      },
+      "Zaber_connection": {
+        "checked": "2026-10-12T00:25:24.693508+09:00",
+        "candidate_port": "COM6",
+        "USB_converter_serial": "A10PSNGVA",
+        "USB_converter_driver_status": "OK",
+        "USB_converter_detected": true,
+        "device_communication_verified": false,
+        "device_model_verified": false,
+        "position_available": false,
+        "position_mm": null,
+        "motion_commands_issued": false,
+        "homing_commands_issued": false,
+        "verification_artifact": "Zaber_USB_verification_20261012_002025.json",
+        "state": "USB_converter_ready_device_response_pending"
+      },
+      "PD_GUI_verification_artifact": "PD_current_GUI_verification_20261012.json",
+      "PD_peak_readout_displayed": false,
+      "PD_power_readout_source": "current_CH1_VAVG_sample",
+      "PINN_deferred_by_user": false,
+      "Zaber_deferred_for_current_session": true
+    },
+    "viewers": {
+      "192.168.0.36": "2026-10-12T01:14:07.415981+09:00",
+      "127.0.0.1": "2026-10-12T01:14:07.430468+09:00"
+    },
+    "legacy_gui": "PAT/PAT/FSM_PSD/conex_pat_modules/simple_gui.py",
+    "server_time": "2026-10-12T01:14:07.430877+09:00"
+  },
+  "finished": "2026-10-12T01:14:07.431901+09:00",
+  "PINN_model_path": "validation/calibration/PSD_FSM_PINN_recalibration_20261012_PINN_model.json",
+  "PINN_validation": {
+    "state": "validated_local_PSD_position_PINN",
+    "model": "measured_local_ray_geometry_Frozen_PINN",
+    "scope": "Local receiver position control, before physical PD alignment",
+    "reference_commit": "1192e7e92b885bfcb72e1c712948c8624cd3b3b5",
+    "simulation": false,
+    "source_current_mA": 32,
+    "spectral_side": 24,
+    "normalized_half_width": 5.0,
+    "feedback_center_xy": [
+      -0.009179469730705023,
+      0.05904808449745179
+    ],
+    "feedback_coordinate_scale": 0.0031266136094927786,
+    "PSD_coordinate_center_mm": [
+      -0.007259520000000012,
+      0.015787607999999977
+    ],
+    "PSD_coordinate_scale_mm": 0.76678,
+    "measured_feedback_xy": [
+      [
+        -0.012293931841850281,
+        0.05603987649083138
+      ],
+      [
+        -0.010668332129716874,
+        0.05601385235786438
+      ],
+      [
+        -0.009073038399219514,
+        0.056005702912807466
+      ],
+      [
+        -0.007586186472326517,
+        0.05601344257593155
+      ],
+      [
+        -0.006081849988549948,
+        0.05600793808698654
+      ],
+      [
+        -0.00614751148968935,
+        0.05760519206523895
+      ],
+      [
+        -0.007718200422823429,
+        0.05759584009647369
+      ],
+      [
+        -0.009318603575229645,
+        0.05757578238844872
+      ],
+      [
+        -0.010749864205718041,
+        0.05757536366581917
+      ],
+      [
+        -0.012331542186439037,
+        0.057572074234485626
+      ],
+      [
+        -0.012216443568468094,
+        0.0591867744922638
+      ],
+      [
+        -0.01065202448517084,
+        0.05903096422553063
+      ],
+      [
+        -0.009081145375967025,
+        0.05899410769343376
+      ],
+      [
+        -0.0076137598603963855,
+        0.058930692821741106
+      ],
+      [
+        -0.006081887893378735,
+        0.05903796032071114
+      ],
+      [
+        -0.006167266052216291,
+        0.06059551388025284
+      ],
+      [
+        -0.007713279128074646,
+        0.060529055446386336
+      ],
+      [
+        -0.009261102229356766,
+        0.06055802553892135
+      ],
+      [
+        -0.010745237208902835,
+        0.060527123510837555
+      ],
+      [
+        -0.012329856120049953,
+        0.06051360368728638
+      ],
+      [
+        -0.012229090370237828,
+        0.06213432252407074
+      ],
+      [
+        -0.010628810524940491,
+        0.06205003708600998
+      ],
+      [
+        -0.009104929864406586,
+        0.06201455518603325
+      ],
+      [
+        -0.00761453490704298,
+        0.06203269511461258
+      ],
+      [
+        -0.00607831496745348,
+        0.062061616033315656
+      ]
+    ],
+    "measured_PSD_mm": [
+      [
+        -0.7820400000000001,
+        0.53594
+      ],
+      [
+        -0.38154000000000005,
+        0.52134
+      ],
+      [
+        0.026282000000000007,
+        0.51494
+      ],
+      [
+        0.38936000000000004,
+        0.51136
+      ],
+      [
+        0.74454,
+        0.51644
+      ],
+      [
+        0.73148,
+        0.25462
+      ],
+      [
+        0.36038,
+        0.24808
+      ],
+      [
+        -0.04245800000000001,
+        0.2518
+      ],
+      [
+        -0.38632,
+        0.26052
+      ],
+      [
+        -0.78284,
+        0.26861999999999997
+      ],
+      [
+        -0.75492,
+        0.0072542
+      ],
+      [
+        -0.37078,
+        0.019962
+      ],
+      [
+        0.018504,
+        0.020194
+      ],
+      [
+        0.3758,
+        0.024426
+      ],
+      [
+        0.7507199999999999,
+        0.009894
+      ],
+      [
+        0.72824,
+        -0.2406
+      ],
+      [
+        0.36048,
+        -0.24412000000000003
+      ],
+      [
+        -0.013266,
+        -0.23653999999999997
+      ],
+      [
+        -0.39,
+        -0.22568000000000002
+      ],
+      [
+        -0.77968,
+        -0.21626000000000004
+      ],
+      [
+        -0.7627200000000001,
+        -0.48645999999999995
+      ],
+      [
+        -0.36094,
+        -0.47722
+      ],
+      [
+        0.017929999999999998,
+        -0.47862
+      ],
+      [
+        0.3766,
+        -0.48538000000000003
+      ],
+      [
+        0.7457,
+        -0.47982
+      ]
+    ],
+    "feedback_to_PSD_mm_per_xy": [
+      [
+        245.51907756788438,
+        0.2620039364455343
+      ],
+      [
+        -2.6468324903994658,
+        -165.7881529850277
+      ]
+    ],
+    "linear_geometry_rms_mm": 0.006147439882794802,
+    "training_sample_count": 20,
+    "withheld_sample_count": 5,
+    "withheld_sample_indices": [
+      2,
+      7,
+      12,
+      17,
+      22
+    ],
+    "neural_primitive": "PINN_reference.solver.frozen_pinn.FrozenPINNBasis",
+    "optimizer": "PINN_reference.solver.optimization.projected_gradient_ascent",
+    "physics_equation": "d(PSD_position_mm)/d(mirror_feedback_xy) - measured_local_ray_Jacobian = 0",
+    "physics_scope": "First-order reflected-ray approximation; measured scale, signs and axis rotation",
+    "actuator_mode": "device_xy_servo",
+    "command_unit": "normalized_mirror_xy",
+    "external_PAT_PID_or_KF_used": false,
+    "source_stage_position_used": false,
+    "PD_input_required": false,
+    "physical_center_coincidence_verified": false,
+    "absolute_PSD_coordinate_accuracy_verified": false,
+    "withheld_PSD_rms_mm": 0.005397970199797121,
+    "normalized_physics_derivative_rms": 0.004860135615592684,
+    "basis_rank": 80,
+    "dataset_artifact": "validation/calibration/PSD_FSM_PINN_recalibration_20261012.json",
+    "calibration_time": "2026-10-12T01:14:07.431901+09:00"
+  }
+}

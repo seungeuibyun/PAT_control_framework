@@ -1,0 +1,22 @@
+{
+  "model": "PDA015C2",
+  "wavelength_nm": 1562,
+  "responsivity_reference_wavelength_nm": 1550,
+  "responsivity_A_per_W": 0.95,
+  "gain_high_z_V_per_A": 50000.0,
+  "gain_50ohm_V_per_A": 25000.0,
+  "default_load": "high_z",
+  "physical_load_verified": false,
+  "dark_voltage_V": null,
+  "dark_artifact": null,
+  "absolute_optical_power_calibrated": false,
+  "power_display_kind": "nominal_estimate",
+  "responsivity_at_1562nm_measured": false,
+  "default_display_unit": "dBm",
+  "formula": "P_est_W = (current_CH1_VAVG_V - newly_measured_dark_voltage_V) / (responsivity_A_per_W * load_gain_V_per_A)",
+  "dBm_reference_W": 0.001,
+  "dBm_formula": "10 * log10(P_est_W / 0.001)",
+  "power_readout_source": "current_CH1_VAVG_sample",
+  "historical_peak_used": false,
+  "instructions": "Populate dark and verified load after a fresh measurement, then save locally as PD_readout_conversion.json"
+}

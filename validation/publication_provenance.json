@@ -1,0 +1,142 @@
+{
+  "scope": "Curated copy of the local physical testbed controller and dependencies",
+  "measurement_files": "Historical measurements; local absolute paths and credential keys removed",
+  "original_hardware_environment_modified": false,
+  "source_files": [
+    {
+      "source": "PINN_testbed/psd_position_pinn.py",
+      "published": "validation/psd_position_pinn.py",
+      "source_sha256": "620115fcef730799e963aaaf43929df0436bb5117013551602005f5a079ed2de",
+      "publication_changes": [],
+      "published_sha256": "620115fcef730799e963aaaf43929df0436bb5117013551602005f5a079ed2de"
+    },
+    {
+      "source": "PINN_testbed/receiver_pinn.py",
+      "published": "validation/receiver_pinn.py",
+      "source_sha256": "7161f8f682be22f52d96cf3ec16b6c317367b97b0d429f1f7654b0bf442f87c6",
+      "publication_changes": [
+        "Resolve upstream imports from repository root"
+      ],
+      "published_sha256": "fd2387e6753e182e1911070384927d20977014d097e24fbe04275084b8b40886"
+    },
+    {
+      "source": "PINN_testbed/run_psd_pinn.py",
+      "published": "validation/run_psd_pinn.py",
+      "source_sha256": "d3317d789f135dda39ec2ca317b8a001d8de11966a70104e77217fff51f2fbd6",
+      "publication_changes": [],
+      "published_sha256": "d3317d789f135dda39ec2ca317b8a001d8de11966a70104e77217fff51f2fbd6"
+    },
+    {
+      "source": "PINN_testbed/reference_trajectory.py",
+      "published": "validation/reference_trajectory.py",
+      "source_sha256": "31f1a7f686a71bb01cc8e0c1928cc2c3082ffded69ac6ee08dd2d45ff268e0fc",
+      "publication_changes": [],
+      "published_sha256": "31f1a7f686a71bb01cc8e0c1928cc2c3082ffded69ac6ee08dd2d45ff268e0fc"
+    },
+    {
+      "source": "PINN_testbed/check_psd_position_pinn.py",
+      "published": "validation/check_psd_position_pinn.py",
+      "source_sha256": "3fbe450e32a6d518a0a5fdec9e54a987471d931fa56298db87b857634e46342b",
+      "publication_changes": [],
+      "published_sha256": "3fbe450e32a6d518a0a5fdec9e54a987471d931fa56298db87b857634e46342b"
+    },
+    {
+      "source": "PINN_testbed/live_psd_server.py",
+      "published": "validation/live_psd_server.py",
+      "source_sha256": "df017b87f3936588f39cf8dca17143a3e0b80fd88d473f7bc34f138d7f8a0b92",
+      "publication_changes": [],
+      "published_sha256": "df017b87f3936588f39cf8dca17143a3e0b80fd88d473f7bc34f138d7f8a0b92"
+    },
+    {
+      "source": "PINN_testbed/live_pat_gui.html",
+      "published": "validation/live_pat_gui.html",
+      "source_sha256": "4e26c56cda614eca9dad0da064ee7da1bc4d9cd56699c4616be71aafa2fb8262",
+      "publication_changes": [],
+      "published_sha256": "4e26c56cda614eca9dad0da064ee7da1bc4d9cd56699c4616be71aafa2fb8262"
+    },
+    {
+      "source": "PINN_testbed/calibration/manual_fsm.py",
+      "published": "validation/calibration/manual_fsm.py",
+      "source_sha256": "777c5abb72e1ff52fd7a5a95847d3884b0a1535242da2cd18e5e82ff45429ddd",
+      "publication_changes": [],
+      "published_sha256": "777c5abb72e1ff52fd7a5a95847d3884b0a1535242da2cd18e5e82ff45429ddd"
+    },
+    {
+      "source": "PINN_testbed/calibration/shared_acquisition.py",
+      "published": "validation/calibration/shared_acquisition.py",
+      "source_sha256": "bb6885cf13ee1c7236eb5de929d74578b6055044436163e05af4e32f6095a448",
+      "publication_changes": [],
+      "published_sha256": "bb6885cf13ee1c7236eb5de929d74578b6055044436163e05af4e32f6095a448"
+    },
+    {
+      "source": "PINN_testbed/calibration/xy_motion.py",
+      "published": "validation/calibration/xy_motion.py",
+      "source_sha256": "0c6b184c4b5b6a8ca0ae1fd1e0d7ff25015d4786b6904f6c0848743c7f970713",
+      "publication_changes": [],
+      "published_sha256": "0c6b184c4b5b6a8ca0ae1fd1e0d7ff25015d4786b6904f6c0848743c7f970713"
+    },
+    {
+      "source": "PINN_testbed/calibration/rigol_scope.py",
+      "published": "validation/calibration/rigol_scope.py",
+      "source_sha256": "d4dc40743b7a64003326ed73d9da5412a4a0bd6e2631d52a0607472a64178602",
+      "publication_changes": [],
+      "published_sha256": "d4dc40743b7a64003326ed73d9da5412a4a0bd6e2631d52a0607472a64178602"
+    },
+    {
+      "source": "PINN_testbed/calibration/laser_termite.py",
+      "published": "validation/calibration/laser_termite.py",
+      "source_sha256": "9fec2a74d3a4afe6149a92b0c5c77f1594b674279884010ad18461a59596e827",
+      "publication_changes": [],
+      "published_sha256": "9fec2a74d3a4afe6149a92b0c5c77f1594b674279884010ad18461a59596e827"
+    },
+    {
+      "source": "PINN_testbed/calibration/find_pd_maximum.py",
+      "published": "validation/calibration/find_pd_maximum.py",
+      "source_sha256": "5df8e197a83ee729340373f61b89c782ef6274d8251ad4497585dccd58b99e05",
+      "publication_changes": [],
+      "published_sha256": "5df8e197a83ee729340373f61b89c782ef6274d8251ad4497585dccd58b99e05"
+    },
+    {
+      "source": "PINN_testbed/calibration/fsm_reacquisition.py",
+      "published": "validation/calibration/fsm_reacquisition.py",
+      "source_sha256": "4be31e68972270d5bd670598b6a6c9415fd90405407bc61b50f10a32abbe5b6d",
+      "publication_changes": [],
+      "published_sha256": "4be31e68972270d5bd670598b6a6c9415fd90405407bc61b50f10a32abbe5b6d"
+    },
+    {
+      "source": "PINN_testbed/calibration/verify_psd_feedback.py",
+      "published": "validation/calibration/verify_psd_feedback.py",
+      "source_sha256": "945ae1921024662192e758a9624e49787b9780365937d710a29a3ad23966743a",
+      "publication_changes": [],
+      "published_sha256": "945ae1921024662192e758a9624e49787b9780365937d710a29a3ad23966743a"
+    },
+    {
+      "source": "PINN_testbed/calibration/calibrate_source_off_dark.py",
+      "published": "validation/calibration/calibrate_source_off_dark.py",
+      "source_sha256": "ab63abf0835824f0044aa3fae2a31be63f2522caf8e4d3e9b6bf983a70faf5f0",
+      "publication_changes": [],
+      "published_sha256": "ab63abf0835824f0044aa3fae2a31be63f2522caf8e4d3e9b6bf983a70faf5f0"
+    },
+    {
+      "source": "PINN_testbed/calibration/calibrate_fsm_psd.py",
+      "published": "validation/calibration/calibrate_fsm_psd.py",
+      "source_sha256": "3be0abfb9c9f2312e0998c78afa49176cc7260c47533b35ae89e077e92efe62a",
+      "publication_changes": [],
+      "published_sha256": "3be0abfb9c9f2312e0998c78afa49176cc7260c47533b35ae89e077e92efe62a"
+    },
+    {
+      "source": "PINN_testbed/calibration/inspect_mounted_receiver.py",
+      "published": "validation/calibration/inspect_mounted_receiver.py",
+      "source_sha256": "ab8d37c149beebcd8a46c7ddf35717ac3fcf0464d69683beb70330f1fbd86fd6",
+      "publication_changes": [],
+      "published_sha256": "ab8d37c149beebcd8a46c7ddf35717ac3fcf0464d69683beb70330f1fbd86fd6"
+    },
+    {
+      "source": "PINN_testbed/calibration/measure_mounted_source_power.py",
+      "published": "validation/calibration/measure_mounted_source_power.py",
+      "source_sha256": "25630435178addbb1bda8af6cb52cc429b565f5813e6f6219e33e995747e1357",
+      "publication_changes": [],
+      "published_sha256": "25630435178addbb1bda8af6cb52cc429b565f5813e6f6219e33e995747e1357"
+    }
+  ]
+}

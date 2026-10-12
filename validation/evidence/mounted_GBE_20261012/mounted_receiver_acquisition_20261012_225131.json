@@ -1,0 +1,1002 @@
+{
+  "started": "2026-10-12T22:51:31.414108+09:00",
+  "state": "no_significant_PD_improvement_in_2mm_stage_probe",
+  "source_commands_issued": false,
+  "stage_points": [
+    {
+      "label": "Zaber_+0mm",
+      "time": "2026-10-12T22:51:33.006561+09:00",
+      "PSD_mm": [
+        0.30069999999999997,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.027690328378592508,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813091.7576208,
+          "reply": "1GP0.3266,5,1",
+          "values": [
+            0.3266,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813091.8375204,
+          "reply": "1GP0.3283,5,1",
+          "values": [
+            0.3283,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813091.8874855,
+          "reply": "1GP0.2987,5,1",
+          "values": [
+            0.2987,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813091.9500725,
+          "reply": "1GP0.2833,5,1",
+          "values": [
+            0.2833,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813092.0146904,
+          "reply": "1GP0.2458,5,1",
+          "values": [
+            0.2458,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813092.0932178,
+          "reply": "1GP0.3252,5,1",
+          "values": [
+            0.3252,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813092.1889331,
+          "reply": "1GP0.297,5,1",
+          "values": [
+            0.297,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03409027,
+        0.03407361,
+        0.03405353
+      ],
+      "PD_mean_V": 0.03407247,
+      "FSM_feedback_xy": [
+        0.043746162205934525,
+        0.03893672674894333
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.8917168015614152,
+        -1.1138524860143661
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2034720,
+      "stage_offset_mm": 0.0
+    },
+    {
+      "label": "Zaber_+0.5mm",
+      "time": "2026-10-12T22:51:35.289395+09:00",
+      "PSD_mm": [
+        0.3892857142857143,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.027789177162106455,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813093.979138,
+          "reply": "1GP0.3339,5,1",
+          "values": [
+            0.3339,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.0434897,
+          "reply": "1GP0.3931,5,1",
+          "values": [
+            0.3931,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.1069245,
+          "reply": "1GP0.374,5,1",
+          "values": [
+            0.374,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.1717718,
+          "reply": "1GP0.3825,5,1",
+          "values": [
+            0.3825,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.2344046,
+          "reply": "1GP0.4104,5,1",
+          "values": [
+            0.4104,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.3145869,
+          "reply": "1GP0.4051,5,1",
+          "values": [
+            0.4051,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813094.4114728,
+          "reply": "1GP0.426,5,1",
+          "values": [
+            0.426,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03405689,
+        0.03405353,
+        0.03401337
+      ],
+      "PD_mean_V": 0.034041263333333335,
+      "FSM_feedback_xy": [
+        0.04379674792289734,
+        0.038931310176849365
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.4420709447003901,
+        0.029253307729959488
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2039759,
+      "stage_offset_mm": 0.49996328125
+    },
+    {
+      "label": "Zaber_+1mm",
+      "time": "2026-10-12T22:51:37.731901+09:00",
+      "PSD_mm": [
+        0.5511571428571429,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.014023027708824123,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813096.329526,
+          "reply": "1GP0.5591,5,1",
+          "values": [
+            0.5591,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.3932765,
+          "reply": "1GP0.5501,5,1",
+          "values": [
+            0.5501,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.4740093,
+          "reply": "1GP0.5472,5,1",
+          "values": [
+            0.5472,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.5211139,
+          "reply": "1GP0.5583,5,1",
+          "values": [
+            0.5583,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.5854146,
+          "reply": "1GP0.5747,5,1",
+          "values": [
+            0.5747,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.6658921,
+          "reply": "1GP0.5264,5,1",
+          "values": [
+            0.5264,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813096.76091,
+          "reply": "1GP0.5423,5,1",
+          "values": [
+            0.5423,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.0341037,
+        0.03412708,
+        0.03406018
+      ],
+      "PD_mean_V": 0.03409698666666667,
+      "FSM_feedback_xy": [
+        0.04373759776353836,
+        0.03892756998538971
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.6841879221610725,
+        -0.5942590069025755
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2044799,
+      "stage_offset_mm": 1.00002578125
+    },
+    {
+      "label": "Zaber_+2mm",
+      "time": "2026-10-12T22:51:40.456700+09:00",
+      "PSD_mm": [
+        0.7368285714285714,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.03422913188188907,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813099.2550528,
+          "reply": "1GP0.7704,5,1",
+          "values": [
+            0.7704,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.318261,
+          "reply": "1GP0.7207,5,1",
+          "values": [
+            0.7207,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.36817,
+          "reply": "1GP0.7465,5,1",
+          "values": [
+            0.7465,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.4308498,
+          "reply": "1GP0.7286,5,1",
+          "values": [
+            0.7286,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.4946702,
+          "reply": "1GP0.6664,5,1",
+          "values": [
+            0.6664,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.5740678,
+          "reply": "1GP0.7491,5,1",
+          "values": [
+            0.7491,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813099.6698558,
+          "reply": "1GP0.7761,5,1",
+          "values": [
+            0.7761,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03409363,
+        0.03421405,
+        0.03412043
+      ],
+      "PD_mean_V": 0.03414270333333334,
+      "FSM_feedback_xy": [
+        0.04375843331217766,
+        0.03889301046729088
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.4766591009683907,
+        -0.10930490680038929
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2054877,
+      "stage_offset_mm": 1.99995234375
+    },
+    {
+      "label": "Zaber_+0mm",
+      "time": "2026-10-12T22:51:44.088476+09:00",
+      "PSD_mm": [
+        0.2895428571428571,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.02188651621059721,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813102.9316373,
+          "reply": "1GP0.2761,5,1",
+          "values": [
+            0.2761,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.0114007,
+          "reply": "1GP0.2867,5,1",
+          "values": [
+            0.2867,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.0923283,
+          "reply": "1GP0.2952,5,1",
+          "values": [
+            0.2952,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.1857338,
+          "reply": "1GP0.268,5,1",
+          "values": [
+            0.268,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.250156,
+          "reply": "1GP0.2851,5,1",
+          "values": [
+            0.2851,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.3003478,
+          "reply": "1GP0.3393,5,1",
+          "values": [
+            0.3393,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813103.362232,
+          "reply": "1GP0.2764,5,1",
+          "values": [
+            0.2764,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03407361,
+        0.03398664,
+        0.03407361
+      ],
+      "PD_mean_V": 0.03404462,
+      "FSM_feedback_xy": [
+        0.04376249387860298,
+        0.038941264152526855
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.3728946903720498,
+        0.20245113410055637
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2034720,
+      "stage_offset_mm": 0.0
+    },
+    {
+      "label": "Zaber_-0.5mm",
+      "time": "2026-10-12T22:51:46.140561+09:00",
+      "PSD_mm": [
+        -0.05765285714285714,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.0337762074815503,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813105.0252666,
+          "reply": "1GP0.01512,5,1",
+          "values": [
+            0.01512,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.088354,
+          "reply": "1GP-0.07346,5,1",
+          "values": [
+            -0.07346,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.1532032,
+          "reply": "1GP-0.05787,5,1",
+          "values": [
+            -0.05787,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.216865,
+          "reply": "1GP-0.08499,5,1",
+          "values": [
+            -0.08499,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.2967496,
+          "reply": "1GP-0.05461,5,1",
+          "values": [
+            -0.05461,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.376392,
+          "reply": "1GP-0.09793,5,1",
+          "values": [
+            -0.09793,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813105.425159,
+          "reply": "1GP-0.04983,5,1",
+          "values": [
+            -0.04983,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03408362,
+        0.03412043,
+        0.0340669
+      ],
+      "PD_mean_V": 0.03409031666666667,
+      "FSM_feedback_xy": [
+        0.0437813438475132,
+        0.03891640529036522
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.9954811539500952,
+        -0.10930490680038929
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2029681,
+      "stage_offset_mm": -0.49996328125
+    },
+    {
+      "label": "Zaber_-1mm",
+      "time": "2026-10-12T22:51:48.566109+09:00",
+      "PSD_mm": [
+        -5.0,
+        -5.0
+      ],
+      "PSD_std_mm": [
+        0.0,
+        0.0
+      ],
+      "PSD_relative_percent": 0.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813107.198341,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.246986,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.3107653,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.375521,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.4547622,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.5344796,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813107.6303077,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.0340669,
+        0.03405689,
+        0.03409027
+      ],
+      "PD_mean_V": 0.03407135333333333,
+      "FSM_feedback_xy": [
+        0.04376129433512688,
+        0.03891005739569664
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.4420709447003901,
+        -0.4903404042124748
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2024641,
+      "stage_offset_mm": -1.00002578125
+    },
+    {
+      "label": "Zaber_-2mm",
+      "time": "2026-10-12T22:51:51.300529+09:00",
+      "PSD_mm": [
+        -5.0,
+        -5.0
+      ],
+      "PSD_std_mm": [
+        0.0,
+        0.0
+      ],
+      "PSD_relative_percent": 0.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813110.1080587,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.171486,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.2362745,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.3158078,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.3963563,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.4587035,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        },
+        {
+          "time_s": 1791813110.5229301,
+          "reply": "1GP-5,-5,0",
+          "values": [
+            -5.0,
+            -5.0,
+            0.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03408698,
+        0.0341037,
+        0.03408698
+      ],
+      "PD_mean_V": 0.03409255333333334,
+      "FSM_feedback_xy": [
+        0.043755728751420975,
+        0.03891885653138161
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.4766591009683907,
+        -0.1785841304808855
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2014563,
+      "stage_offset_mm": -1.99995234375
+    },
+    {
+      "label": "Zaber_+0mm",
+      "time": "2026-10-12T22:51:55.007554+09:00",
+      "PSD_mm": [
+        0.28178571428571436,
+        5.0
+      ],
+      "PSD_std_mm": [
+        0.038538568012963265,
+        0.0
+      ],
+      "PSD_relative_percent": 1.0,
+      "PSD_raw_readings": [
+        {
+          "time_s": 1791813113.7679913,
+          "reply": "1GP0.2953,5,1",
+          "values": [
+            0.2953,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813113.832234,
+          "reply": "1GP0.3049,5,1",
+          "values": [
+            0.3049,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813113.8963223,
+          "reply": "1GP0.2751,5,1",
+          "values": [
+            0.2751,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813113.9599006,
+          "reply": "1GP0.3449,5,1",
+          "values": [
+            0.3449,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813114.0071576,
+          "reply": "1GP0.2291,5,1",
+          "values": [
+            0.2291,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813114.0880635,
+          "reply": "1GP0.2295,5,1",
+          "values": [
+            0.2295,
+            5.0,
+            1.0
+          ]
+        },
+        {
+          "time_s": 1791813114.1838489,
+          "reply": "1GP0.2937,5,1",
+          "values": [
+            0.2937,
+            5.0,
+            1.0
+          ]
+        }
+      ],
+      "PD_samples_V": [
+        0.03409699,
+        0.0340368,
+        0.03412372
+      ],
+      "PD_mean_V": 0.03408583666666667,
+      "FSM_feedback_xy": [
+        0.04377679526805878,
+        0.03890717774629593
+      ],
+      "FSM_target_xy": null,
+      "actual_coil_current_mA": [
+        -0.9954811539500952,
+        0.4449281841516495
+      ],
+      "scope_scale_V_per_div": 0.1,
+      "usable_spot": false,
+      "stage_position_native": 2034720,
+      "stage_offset_mm": 0.0
+    }
+  ],
+  "FSM_points": [],
+  "PINN_used": false,
+  "PSD_coordinates": "Unmodified native 1GP, mm",
+  "stage_scale_mm_per_native_unit": 9.921875e-05,
+  "new_geometry_calibrated": false,
+  "stage_radius_mm": 2.0,
+  "stage_only": true,
+  "initial_stage_native": 2034720,
+  "initial_stage_nominal_mm": 201.882375,
+  "initial_FSM_state": {
+    "connected": true,
+    "control_available": true,
+    "port": "COM5",
+    "max_current_mA": 150.0,
+    "target_current_mA": [
+      0.0,
+      0.0
+    ],
+    "control_mode": "manual_current",
+    "target_xy": null,
+    "fault": null,
+    "automatic_search_active": false,
+    "time": 1791813091.389128,
+    "sample_count": 16822,
+    "feedback_xy": [
+      0.04378331080079079,
+      0.0389101505279541
+    ],
+    "actual_current_mA": [
+      -0.545835355296731,
+      -0.38642133586108685
+    ],
+    "applied_current_mA": [
+      0.0,
+      0.0
+    ],
+    "applied_xy": null,
+    "device_status": 0,
+    "operation_mode": 0,
+    "temperature_C": 28.0,
+    "moving": false,
+    "error": null,
+    "age_s": 0.024229049682617188
+  },
+  "stage_commands": [
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0",
+    "@01 0 OK BUSY -- 0"
+  ],
+  "finished": "2026-10-12T22:51:55.345391+09:00",
+  "final_state": {
+    "psd": {
+      "port": "COM4",
+      "connected": true,
+      "sample_count": 34408,
+      "identity": "1IDCONEX-PSD10-GE",
+      "x_mm": null,
+      "y_mm": null,
+      "relative_percent": 1.0,
+      "time": 1791813115.332684,
+      "error": null,
+      "position_available": false,
+      "signal_state": "position_limit",
+      "edge_margin_mm": 0.0,
+      "age_s": 0.021303176879882812,
+      "raw_position_mm": [
+        0.3676,
+        5.0
+      ]
+    },
+    "fsm": {
+      "connected": true,
+      "control_available": true,
+      "port": "COM5",
+      "max_current_mA": 150.0,
+      "target_current_mA": [
+        0.0,
+        0.0
+      ],
+      "control_mode": "manual_current",
+      "target_xy": null,
+      "fault": null,
+      "automatic_search_active": false,
+      "time": 1791813115.2565756,
+      "sample_count": 17015,
+      "feedback_xy": [
+        0.04378226026892662,
+        0.03895382955670357
+      ],
+      "actual_current_mA": [
+        -0.19995399634353817,
+        -0.5596193950623274
+      ],
+      "applied_current_mA": [
+        0.0,
+        0.0
+      ],
+      "applied_xy": null,
+      "device_status": 0,
+      "operation_mode": 0,
+      "temperature_C": 28.0,
+      "moving": false,
+      "error": null,
+      "age_s": 0.10317349433898926
+    },
+    "pd": {
+      "connected": true,
+      "channel": "CH1",
+      "scope_ip": "192.168.10.2",
+      "scale_V_per_div": 0.1,
+      "mean_voltage_V": 0.0340669,
+      "time": 1791813115.172618,
+      "error": null,
+      "identity": "RIGOL TECHNOLOGIES,MSO1104Z,DS1ZD190300117,00.04.04.SP1",
+      "age_s": 0.20569562911987305
+    }
+  }
+}

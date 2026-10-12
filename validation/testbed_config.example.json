@@ -1,0 +1,20 @@
+{
+  "purpose": "Connection reference for CLI arguments; this file does not start instruments",
+  "snapshot_time": "2026-10-12T23:14:49+09:00",
+  "laser_wavelength_nm": 1562,
+  "host": {"bind": "192.168.0.30", "port": 8765, "viewer_ip": "192.168.0.36"},
+  "psd": {"model": "CONEX-PSD10GE", "port": "COM4", "baudrate": 921600, "native_units": "mm"},
+  "fsm": {"base": "MR-E-3", "head": "MR-15-30", "port": "COM5", "command_units": "normalized XY"},
+  "pd": {"model": "PDA015C2", "scope_channel": "CH1", "external_power": true},
+  "scope": {"model": "MSO1104Z", "ip": "192.168.10.2", "source_ip": "192.168.10.3", "protocol": "VXI-11"},
+  "source": {"model": "DFB-SM-M-1560-25", "port": "COM3", "baudrate": 9600, "owner": "Termite", "current_mA_at_last_diagnostic": 34},
+  "zaber": {"model": "X-LSQ450A-E01C", "port": "COM6", "baudrate": 115200, "address": 1, "reference_warning_at_last_diagnostic": "WR"},
+  "controller": {
+    "source_stage_position_input": false,
+    "PD_power_objective_implemented_in_active_position_loop": false,
+    "PSD_reference_mm": [0.0, 0.0],
+    "historical_model_source_current_mA": 32,
+    "mounted_GBE_geometry_validated": false,
+    "automatic_run_enabled": false
+  }
+}

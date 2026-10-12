@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv*/
+node_modules/
+*.log
+/calibration/*.json
+!/calibration/*.example.json
+/calibration/*.jsonl
+/calibration/*.npz
+/calibration/live_gui_connection.json
+*.local.json

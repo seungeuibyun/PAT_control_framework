@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FSM 궤적 · PSD 실측 궤적</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#182531;font-family:Segoe UI,Malgun Gothic,sans-serif}main{max-width:1320px;margin:auto;padding:22px}header,.heading{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px}h1{font-size:25px;margin:0 0 7px}h2{font-size:18px;margin:0}h3{font-size:15px;margin:0 0 12px}p{margin:0;color:#637282;font-size:13px;line-height:1.6}.badge{border-radius:20px;padding:8px 13px;font-size:13px;background:#e7eef3;white-space:nowrap}.badge.ok{background:#dff3e6;color:#20673c}.badge.warn{background:#fff0d0;color:#80551b}.panel,.card{background:white;border:1px solid #dde3e9;border-radius:11px;padding:17px}.trajectory-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}.plotbox{width:100%;aspect-ratio:1}canvas{width:100%;height:100%;display:block}.control-pad{touch-action:none;cursor:crosshair}.control-pad.unavailable{cursor:default}.help{font-size:12px;color:#687785;line-height:1.65;margin-top:9px}.legend{display:flex;flex-wrap:wrap;gap:13px;font-size:12px;color:#687785;margin-top:7px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#d94743;margin-right:5px}.blue{background:#246dba}.green{background:#269775}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:14px 0}.label{font-size:12px;color:#617080;margin-bottom:6px}.number{font-size:25px;font-variant-numeric:tabular-nums}.unit{font-size:12px;color:#687684}.controls{display:grid;grid-template-columns:300px 1fr;gap:18px;margin-top:18px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;margin:15px 0}.value{font-size:17px;font-variant-numeric:tabular-nums}.arrows{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:15px 0}button,select,input{font:inherit}button{border:1px solid #c9d6e2;border-radius:7px;background:#eef5fc;color:#23496e;padding:10px 9px;cursor:pointer;font-weight:600;font-size:13px}button:hover:enabled{background:#dcecfb}button:disabled{opacity:.45;cursor:not-allowed}.wide{width:100%;margin-top:9px}.stop{background:#b72f2f;color:white;border-color:#b72f2f}.stop:hover:enabled{background:#9f2626}select,input{padding:9px;border:1px solid #c9d6e2;border-radius:6px;background:white;color:#23394e}select{width:100%}.numeric{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.numeric input{width:100%}.message{font-size:12px;color:#426179;line-height:1.6;min-height:40px;margin-top:10px}.message.error{color:#af2828}.footer{margin-top:16px;display:flex;justify-content:space-between;gap:15px;font-size:12px;color:#667887}.notice{color:#986c20;font-size:13px;min-height:20px}.meter{height:10px;border-radius:5px;background:#edf1f4;overflow:hidden;margin-top:10px}.fill{height:100%;background:#33955a;transition:width .1s linear}.view-control{display:flex;align-items:center;gap:12px;margin:12px 0}.view-control select{max-width:210px}.trace-controls{display:flex;gap:10px;align-items:center;justify-content:space-between}.status-line{font-size:13px;color:#486176;margin:12px 0}
+@media(max-width:760px){main{padding:13px}.trajectory-grid,.controls{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.footer,header{align-items:flex-start;flex-direction:column}}
+.pd-panel{margin:16px 0}.pd-panel .cards{grid-template-columns:repeat(3,1fr);margin:8px 0}.pd-panel .number{font-size:30px}.pd-panel .pd-power{color:#177565}.pd-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px}.pd-toolbar .help{margin:0}.pd-details{margin-top:12px;font-size:12px;color:#637282}.pd-details summary{cursor:pointer;color:#315a79;font-weight:600}.pd-history-box{width:100%;height:215px;margin-top:10px}.pd-options{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}.pd-options select{max-width:260px}.pd-panel .help a{color:#315a79}
+@media(max-width:760px){.pd-panel .cards{grid-template-columns:1fr}}
+</style>
+<main>
+<header><div><h1>FSM 거울 자세 궤적과 PSD 빔 위치 궤적</h1><p>Optotune MR-E-3 · CONEX-PSD10GE · 같은 운전 구간의 명령과 센서 기록</p></div><span id="server-status" class="badge">장치 연결 확인 중</span></header>
+<div class="trace-controls"><p>FSM 명령/센서 좌표와 PSD 실측 mm를 각각 표시합니다. 현재 실측 대응: FSM X+ → PSD X+, FSM Y+ → PSD Y−.</p><button id="clear-trails">두 궤적 화면 지우기</button></div>
+<section class="panel pd-panel" aria-label="PD 수광 출력 실시간 모니터">
+ <div class="heading"><div><h2>PD 현재 출력 · RIGOL CH1</h2><p>현재 CH1 측정 전압과 그 측정값에서 환산한 광전력을 함께 표시합니다.</p></div><span id="pd-status" class="badge">PD 측정 연결 중</span></div>
+ <div class="pd-options"><label for="pd-power-scale">수광 광전력 표시</label><select id="pd-power-scale"><option value="dbm" selected>dBm · 1 mW 기준</option><option value="uw">µW · 선형 단위</option></select></div>
+ <div class="cards">
+  <div class="card"><div class="label">현재 CH1 평균 전압 · 실측</div><div class="number"><span id="pd-voltage-mv">—</span> <span class="unit">mV</span></div><p class="help">오실로스코프의 최신 VAVG 측정값</p></div>
+  <div class="card"><div class="label">현재 수광 광전력 · 사양 기준 추정</div><div class="number pd-power"><span id="pd-power-value">—</span> <span class="unit" id="pd-power-unit">dBm</span></div><p class="help">현재 CH1 전압으로 환산 · 암전 차감 · 절대 광전력 교정 전</p></div>
+  <div class="card"><div class="label">암전 기준을 뺀 출력</div><div class="number"><span id="pd-net-mv">—</span> <span class="unit">mV</span></div><p class="help">암전 기준: <span id="pd-dark-mv">—</span> mV</p></div>
+ </div>
+ <div class="pd-toolbar"><p class="help" id="pd-sample-info">측정값 대기 중</p><button id="pd-clear-history">시간 그래프 기록 지우기</button></div>
+ <details class="pd-details" id="pd-history-details"><summary>PD 시간 그래프 보기 · 최근 60초</summary><div class="pd-options"><label for="pd-history-unit">그래프 단위</label><select id="pd-history-unit"><option value="power_dbm" selected>수광 광전력 추정 · dBm</option><option value="power_uw">수광 광전력 추정 · µW</option><option value="voltage_mv">CH1 원본 평균 전압 · mV</option></select></div><div class="pd-history-box"><canvas id="pd-history" aria-label="실측 PD 출력의 시간 변화"></canvas></div></details>
+ <details class="pd-details" id="pd-settings-details"><summary>광전력 환산 조건</summary><div class="pd-options"><label for="pd-load">실제 연결에 맞는 종단</label><select id="pd-load"><option value="high_z" selected>고임피던스 · BNC 직결 가정</option><option value="50ohm">외부 50 Ω 종단 사용</option></select></div><p class="help" id="pd-conversion-info">환산 조건 확인 중</p><p class="help">dBm은 1 mW 기준 광전력입니다: dBm = 10 log₁₀(P[µW] / 1000). 종단 선택은 화면의 환산 계수만 바꿉니다. 외부 50 Ω 종단을 사용한다면 해당 항목을 선택하세요. <a href="https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=4&amp;pn=PDA015C2" target="_blank" rel="noopener">Thorlabs 검출기 사양</a></p></details>
+</section>
+<section class="panel" id="pinn-panel" hidden>
+ <div class="heading"><div><h2>PAT · 탐색과 PINN 추적</h2><p>PD 수광 감지와 유효 PSD 좌표를 확인한 뒤, PINN이 FSM 자세를 보정합니다.</p></div><span id="pinn-status" class="badge">제어 상태 확인 중</span></div>
+ <div class="stats"><div><div class="label">PSD 목표 X / Y (mm)</div><div class="value" id="pinn-reference">—</div></div><div><div class="label">현재 PSD 목표 오차 (mm)</div><div class="value" id="pinn-error">—</div></div><div><div class="label">PINN 제어 기록</div><div class="value" id="pinn-count">—</div></div></div>
+ <p class="help">PD 출력은 위에서 실시간으로 확인합니다. 현재 시험은 PSD 위치 제어이며 PD 광전력 최대화 검증은 아직 완료하지 않았습니다.</p>
+ <p class="help" id="pinn-acquisition">PSD 실측 피드백으로 중심을 유지합니다.</p>
+</section>
+<section class="trajectory-grid">
+ <div class="panel"><div class="heading"><h2 id="fsm-command-title">FSM 거울 자세 · 정규화 XY</h2><span id="fsm-status" class="badge">FSM 연결 중</span></div><div class="plotbox"><canvas id="fsm-control" class="control-pad unavailable" aria-label="FSM에 보낸 자세 명령과 실제 거울 자세 피드백 궤적"></canvas></div><div class="legend"><span><i class="dot blue"></i>FSM에 전달한 자세 명령 궤적</span><span id="sensor-legend"><i class="dot green"></i>실제 거울 자세 피드백</span></div><div class="view-control"><label for="fsm-view" class="label">FSM 표시 단위</label><select id="fsm-view"><option value="normalized" selected>정규화 XY · 무차원</option><option value="optical_mrad">광학 편향각 성분 · mrad</option></select></div><p class="help" id="fsm-command-help">기준 위치에서의 거울 자세 변화량입니다.</p><div class="status-line">자세 명령 변화: <span id="fsm-command-delta">—</span><br>실제 거울 자세 변화: <span id="fsm-feedback-delta">—</span></div></div>
+ <div class="panel"><div class="heading"><h2>PSD 실제 측정 궤적 · mm</h2><span id="psd-status" class="badge">PSD 연결 중</span></div><div class="plotbox"><canvas id="plot" aria-label="PSD가 직접 측정한 빔 위치와 궤적"></canvas></div><div class="legend"><span><i class="dot"></i>PSD 직접 실측 궤적과 현재 점</span></div><p class="help">빨간 선과 점은 CONEX-PSD10GE에서 읽은 빔 위치입니다.</p><div class="view-control"><label for="psd-view" class="label">PSD 표시 범위</label><select id="psd-view"><option value="1">X/Y ±1 mm</option><option value="3">X/Y ±3 mm</option><option value="5" selected>전체 X/Y ±5 mm</option></select></div><div class="status-line">PSD 실측 X / Y: <span id="psd-position">—</span> mm<br>운전 경과: <span id="elapsed">—</span> · 계측 시각 차이: <span id="sample-gap">—</span> ms</div></div>
+</section>
+<section class="cards">
+ <div class="card"><div class="label">PSD X 실측</div><div class="number"><span id="x">—</span> <span class="unit">mm</span></div></div>
+ <div class="card"><div class="label">PSD Y 실측</div><div class="number"><span id="y">—</span> <span class="unit">mm</span></div></div>
+ <div class="card"><div class="label">PSD 상대 신호</div><div class="number"><span id="power">—</span> <span class="unit">%</span></div><div class="meter"><div id="fill" class="fill" style="width:0"></div></div></div>
+ <div class="card"><div class="label">FSM 명령 → PSD 실측 RMS 오차</div><div class="number"><span id="command-psd-rms">—</span> <span class="unit">µm</span></div><p class="help">실제 명령과 PSD 실측에 사전 교정식을 적용해 단위를 맞춥니다. 응답 지연이 포함된 오차입니다.</p></div>
+</section>
+<div id="notice" class="notice"></div>
+<section class="controls">
+ <div class="panel"><h3>FSM 수동 전류 조절</h3><label class="label" for="step">한 번 누를 때의 전류 변화</label><select id="step"><option value="5">5 mA</option><option value="10">10 mA</option><option value="25" selected>25 mA</option><option value="50">50 mA</option></select><div class="arrows"><span></span><button class="motion" id="fsm-up">↑ Y+</button><span></span><button class="motion" id="fsm-left">← X−</button><button class="motion" id="fsm-zero">0 mA</button><button class="motion" id="fsm-right">X+ →</button><span></span><button class="motion" id="fsm-down">↓ Y−</button><span></span></div><button id="fsm-stop" class="wide stop">즉시 정지 · 0 mA</button><button id="fsm-resume" class="wide" hidden>다시 제어 연결</button><div class="numeric"><label><div class="label">X 전류 명령 (mA)</div><input id="current-x" type="number" min="-150" max="150" step="1" value="0"></label><label><div class="label">Y 전류 명령 (mA)</div><input id="current-y" type="number" min="-150" max="150" step="1" value="0"></label></div><button id="fsm-apply" class="wide motion">전류값 적용</button><div id="fsm-message" class="message">FSM 연결 확인 중</div></div>
+ <div class="panel"><h3>실제 장치 상태</h3><div class="stats"><div><div class="label">구동 모드</div><div class="value" id="fsm-command-mode">—</div></div><div><div class="label">FSM 목표 X / Y · 내부 XY</div><div class="value" id="fsm-target-xy">—</div></div><div><div class="label">실제 X · 내부 XY</div><div class="value" id="fsm-x">—</div></div><div><div class="label">실제 Y · 내부 XY</div><div class="value" id="fsm-y">—</div></div><div><div class="label">실측 코일 전류 X / Y (mA)</div><div class="value" id="fsm-current">—</div></div><div><div class="label">FSM 온도 (°C)</div><div class="value" id="fsm-temp">—</div></div><div><div class="label">명령–FSM 센서 오차 · 내부 XY</div><div class="value" id="servo-error">—</div></div><div><div class="label">PD CH1 출력 (mV)</div><div class="value" id="pd">—</div></div><div><div class="label">궤적 명령</div><div class="value" id="trajectory-law">—</div></div></div><p class="help">두 그래프의 축 방향·진폭·시간에 따른 움직임을 비교할 수 있습니다. 수동 전류 조절과 정지 버튼은 실제 FSM에 적용됩니다.</p><p class="help" id="run-status">실측 기록 대기 중</p></div>
+</section>
+<div class="footer"><span id="connection">실제 장치 연결 확인 중</span><span id="calibration">—</span><span id="time">—</span></div>
+</main>
+<script>
+const $=id=>document.getElementById(id),FSM_KEY='__FSM_CONTROL_KEY__';
+const clientId=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
+let latest=null,fsm=null,commandTrail=[],sensorTrail=[],psdTrail=[],lastCommand=null,lastFSM=-1,lastPSD=-1,polling=false,sequence=0,pending=null,sending=false,dragging=false,inputsDirty=false,stopVersion=0,origin=[0,0],amplitudes=[.002,.002],epoch=null,run=null,startedTime=null;
+const fmt=(v,n=4)=>Number.isFinite(v)?v.toFixed(n):'—',fresh=s=>s&&s.connected&&Number.isFinite(s.age_s)&&s.age_s<2;
+let pdLatest=null,pdHistory=[],lastPDTime=null,pdConversion=null;
+const pdDbm=power=>Number.isFinite(power)&&power>0?10*Math.log10(power/1000):null;
+const pdDisplayPower=power=>$('pd-power-scale').value==='dbm'?pdDbm(power):power;
+function pdEstimate(voltage){
+ if(!pdConversion||!Number.isFinite(voltage)||!pdConversion.scope_DC_verified||!pdConversion.scope_direct_BNC_probe_ratio_verified)return null;
+ const gain=$('pd-load').value==='50ohm'?pdConversion.gain_50ohm_V_per_A:pdConversion.gain_high_z_V_per_A;
+ const response=pdConversion.responsivity_A_per_W;
+ if(!Number.isFinite(gain)||gain<=0||!Number.isFinite(response)||response<=0||!Number.isFinite(pdConversion.dark_voltage_V))return null;
+ return Math.max(0,voltage-pdConversion.dark_voltage_V)/(response*gain)*1e6;
+}
+function updatePD(pd,conversion){
+ if(conversion)pdConversion=conversion;
+ pdLatest=pd;
+ const live=fresh(pd)&&Number.isFinite(pd.mean_voltage_V)&&Number.isFinite(pd.time);
+ if(live&&pd.time!==lastPDTime){
+  lastPDTime=pd.time;pdHistory.push({time:pd.time,voltage_V:pd.mean_voltage_V});
+  if(pdHistory.length>1800)pdHistory.shift();
+ }
+ $('pd-status').textContent=live?'RIGOL CH1 실측 수신 중':pd&&pd.error?'PD 측정값 확인 필요':'PD 측정 연결 중';$('pd-status').className='badge '+(live?'ok':'warn');
+ $('pd-voltage-mv').textContent=live?fmt(pd.mean_voltage_V*1000,2):'—';
+ const dbm=$('pd-power-scale').value==='dbm';
+ $('pd-power-unit').textContent=dbm?'dBm':'µW';
+ $('pd-power-value').textContent=live?fmt(pdDisplayPower(pdEstimate(pd.mean_voltage_V)),dbm?2:3):'—';
+ const dark=pdConversion&&pdConversion.dark_voltage_V;
+ $('pd-net-mv').textContent=live&&Number.isFinite(dark)?fmt((pd.mean_voltage_V-dark)*1000,2):'—';
+ $('pd-dark-mv').textContent=fmt(Number.isFinite(dark)?dark*1000:null,3);
+ $('pd-sample-info').textContent=live?'최근 측정 '+new Date(pd.time*1000).toLocaleTimeString('ko-KR')+' · 수신 지연 '+fmt(pd.age_s,2)+' s · '+(pd.channel||'CH1')+' · '+pd.scope_ip:pd&&pd.error?pd.error:'새 측정값을 기다리는 중입니다.';
+ if(pdConversion){
+  const gain=$('pd-load').value==='50ohm'?pdConversion.gain_50ohm_V_per_A:pdConversion.gain_high_z_V_per_A;
+  $('pd-conversion-info').textContent=pdConversion.scope_DC_verified&&pdConversion.scope_direct_BNC_probe_ratio_verified?
+   pdConversion.wavelength_nm+' nm: '+pdConversion.responsivity_reference_wavelength_nm+' nm 사양 '+pdConversion.responsivity_A_per_W+' A/W를 근사 적용 · 이득 '+fmt(gain/1000,0)+' kV/A · P ≈ (CH1 전압 − 암전 전압) / (감응도 × 이득). 개별 검출기의 절대 광전력 교정은 아직 하지 않았습니다.':'DC 결합과 직접 BNC 연결의 1× 전압 설정이 확인되기 전에는 µW 환산을 표시하지 않습니다.';
+ }
+ drawPDHistory();
+}
+function drawPDHistory(){
+ const canvas=$('pd-history'),r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;
+ const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1,W=r.width,H=r.height;
+ canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+ const now=Date.now()/1000,voltage=$('pd-history-unit').value==='voltage_mv',dbm=$('pd-history-unit').value==='power_dbm',unit=voltage?'mV':dbm?'dBm 추정':'µW 추정';
+ const points=pdHistory.filter(p=>p.time>=now-60).map(p=>({t:p.time,y:voltage?p.voltage_V*1000:dbm?pdDbm(pdEstimate(p.voltage_V)):pdEstimate(p.voltage_V)})).filter(p=>Number.isFinite(p.y));
+ const baseline=voltage&&pdConversion?pdConversion.dark_voltage_V*1000:dbm?null:0;
+ const values=points.map(p=>p.y);if(Number.isFinite(baseline))values.push(baseline);
+ let low=values.length?Math.min(...values):dbm?-60:0,high=values.length?Math.max(...values):dbm?-10:1;
+ const span=Math.max(high-low,voltage||dbm?1:.005);low-=span*.15;high+=span*.15;
+ const L=76,T=16,S=W-L-20,B=H-T-35,px=t=>L+(t-(now-60))*S/60,py=y=>T+(high-y)*B/(high-low);
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafcfd';ctx.fillRect(L,T,S,B);ctx.font='11px Segoe UI';ctx.textBaseline='middle';
+ for(let i=0;i<=4;i++){
+  const y=low+(high-low)*i/4;ctx.strokeStyle='#e4eaf0';ctx.beginPath();ctx.moveTo(L,py(y));ctx.lineTo(L+S,py(y));ctx.stroke();ctx.fillStyle='#647483';ctx.textAlign='right';ctx.fillText(fmt(y,voltage?1:dbm?2:3),L-8,py(y));
+ }
+ for(let i=0;i<=4;i++){
+  const seconds=-60+i*15,x=L+i*S/4;ctx.strokeStyle='#e4eaf0';ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+B);ctx.stroke();ctx.fillStyle='#647483';ctx.textAlign='center';ctx.fillText(seconds+' s',x,T+B+18);
+ }
+ ctx.fillStyle='#536675';ctx.textAlign='left';ctx.fillText(unit,4,8);
+ if(Number.isFinite(baseline)){ctx.setLineDash([4,4]);ctx.strokeStyle='#9aabb7';ctx.beginPath();ctx.moveTo(L,py(baseline));ctx.lineTo(L+S,py(baseline));ctx.stroke();ctx.setLineDash([])}
+ ctx.strokeStyle=voltage?'#246dba':'#177565';ctx.lineWidth=2;ctx.beginPath();points.forEach((p,i)=>{if(i&&p.t-points[i-1].t<=2)ctx.lineTo(px(p.t),py(p.y));else ctx.moveTo(px(p.t),py(p.y))});ctx.stroke();
+ if(points.length){const p=points.at(-1);ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(px(p.t),py(p.y),3,0,Math.PI*2);ctx.fill()}
+ ctx.strokeStyle='#8e9daa';ctx.strokeRect(L,T,S,B);
+}
+$('pd-load').onchange=()=>{updatePD(pdLatest,pdConversion)};
+$('pd-power-scale').onchange=()=>{if($('pd-history-unit').value!=='voltage_mv')$('pd-history-unit').value=$('pd-power-scale').value==='dbm'?'power_dbm':'power_uw';updatePD(pdLatest,pdConversion)};
+$('pd-history-unit').onchange=drawPDHistory;$('pd-history-details').ontoggle=drawPDHistory;
+$('pd-clear-history').onclick=()=>{pdHistory=[];lastPDTime=null;updatePD(pdLatest,pdConversion)};
+const delta=q=>q.map((v,i)=>v-origin[i]);
+const opticalScale=Math.tan(50*Math.PI/180);
+function displayDelta(qDelta){return $('fsm-view').value==='optical_mrad'?qDelta.map((v,i)=>1000*(Math.atan((origin[i]+v)*opticalScale)-Math.atan(origin[i]*opticalScale))):qDelta}
+function clearTrails(){commandTrail=[];sensorTrail=[];psdTrail=[];lastCommand=null;lastFSM=lastPSD=-1}
+function append(trail,point){trail.push(point);if(trail.length>2400)trail.shift()}
+function grid(id,limit,tick,unit,lines,marks,circle=false){
+ const canvas=$(id),ctx=canvas.getContext('2d'),r=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+ canvas.width=Math.max(1,Math.round(r.width*dpr));canvas.height=Math.max(1,Math.round(r.height*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);
+ const W=r.width,H=r.height,L=58,T=16,S=Math.max(1,Math.min(W-L-16,H-T-44)),px=x=>L+(x+limit)*S/(2*limit),py=y=>T+(limit-y)*S/(2*limit);
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafcfd';ctx.fillRect(L,T,S,S);ctx.font='11px Segoe UI';ctx.textAlign='center';ctx.textBaseline='middle';
+ for(let k=-Math.round(limit/tick);k<=Math.round(limit/tick);k++){const n=k*tick;ctx.strokeStyle=k===0?'#aab9c5':'#e4eaf0';ctx.lineWidth=k===0?1.2:1;ctx.beginPath();ctx.moveTo(px(n),T);ctx.lineTo(px(n),T+S);ctx.moveTo(L,py(n));ctx.lineTo(L+S,py(n));ctx.stroke();ctx.fillStyle='#647483';const label=Number(n.toFixed(tick<.01?4:2)).toString();ctx.fillText(label,px(n),T+S+15);ctx.textAlign='right';ctx.fillText(label,L-8,py(n));ctx.textAlign='center'}
+ if(circle){ctx.strokeStyle='#c5d3e0';ctx.beginPath();ctx.arc(px(0),py(0),S/2,0,Math.PI*2);ctx.stroke()}
+ ctx.strokeStyle='#8e9daa';ctx.strokeRect(L,T,S,S);ctx.fillStyle='#536675';ctx.fillText('X '+unit,L+S/2,T+S+35);ctx.save();ctx.translate(12,T+S/2);ctx.rotate(-Math.PI/2);ctx.fillText('Y '+unit,0,0);ctx.restore();
+ ctx.save();ctx.beginPath();ctx.rect(L,T,S,S);ctx.clip();
+ for(const line of lines){if(line.points.length<2)continue;ctx.strokeStyle=line.color;ctx.lineWidth=1.4;ctx.globalAlpha=.72;ctx.beginPath();line.points.forEach((p,i)=>i?ctx.lineTo(px(p[0]),py(p[1])):ctx.moveTo(px(p[0]),py(p[1])));ctx.stroke()}ctx.globalAlpha=1;
+ for(const m of marks){if(!m||!m.xy||!m.xy.every(Number.isFinite))continue;ctx.fillStyle=m.color;ctx.strokeStyle=m.color;ctx.lineWidth=2;const x=px(m.xy[0]),y=py(m.xy[1]);if(m.cross){ctx.beginPath();ctx.moveTo(x-6,y);ctx.lineTo(x+6,y);ctx.moveTo(x,y-6);ctx.lineTo(x,y+6);ctx.stroke()}else{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill()}}ctx.restore();
+}
+function draw(){
+ const flive=fresh(fsm),plive=fresh(latest)&&latest.position_available,positionLive=flive&&fsm.operation_mode===2,xy=positionLive||commandTrail.length>1;
+ const angular=$('fsm-view').value==='optical_mrad';
+ const command=xy?displayDelta(positionLive?delta(fsm.target_xy):commandTrail.at(-1)):flive?fsm.target_current_mA.map(v=>-v):null,sensor=xy&&(positionLive||sensorTrail.length)?displayDelta(positionLive?delta(fsm.feedback_xy):sensorTrail.at(-1)):null;
+ const maxAmplitude=Math.max(...amplitudes),nativeLimit=maxAmplitude<=.0021?.004:Math.ceil(maxAmplitude*1.25/.005)*.005;
+ const angleLimit=maxAmplitude<=.0021?5:Math.ceil(Math.max(...displayDelta(amplitudes).map(Math.abs),...displayDelta(amplitudes.map(v=>-v)).map(Math.abs))*1.25/5)*5;
+ grid('fsm-control',xy?(angular?angleLimit:nativeLimit):150,xy?(angular?(angleLimit<=5?1:5):(nativeLimit<=.005?.001:.005)):50,xy?(angular?'(Δ mrad)':'(Δ XY · 무차원)'):'(mA)',xy?[{points:commandTrail.map(displayDelta),color:'#246dba'},{points:sensorTrail.map(displayDelta),color:'#269775'}]:[],[{xy:command,color:'#246dba'},{xy:sensor,color:'#269775',cross:true}],!xy);
+ const limit=Number($('psd-view').value);
+ grid('plot',limit,limit===1?.25:1,'(mm)',[{points:psdTrail,color:'#d94743'}],[plive?{xy:[latest.x_mm,latest.y_mm],color:'#d94743'}:null]);
+ $('sensor-legend').hidden=!xy;
+ $('fsm-command-title').textContent=xy?(angular?'FSM 거울 자세 · 광학 편향각 성분':'FSM 거울 자세 · 정규화 XY (무차원)'):'FSM 수동 전류 명령';
+ $('fsm-command-help').textContent=xy?(angular?'거울 자세 명령과 피드백을 제조사의 광학 투영각 γ=atan(XY·tan50°)로 표시한 기준점 대비 변화량입니다. 거울 기계각과 구분됩니다.':'파란 선: 실제 자세 명령 · 초록 선/십자: 거울 자세 피드백. XY는 무차원이며 제조사 기준 광학각 ±50°가 XY ±1에 해당합니다. 기준점 대비 변화량입니다.'):'클릭·드래그 또는 버튼으로 전류를 조절합니다. 최대 합성 전류 150 mA.';
+ $('fsm-command-delta').textContent=xy?command.map(v=>fmt(v,angular?3:6)).join(' / ')+(angular?' mrad':' (무차원)'):'—';$('fsm-feedback-delta').textContent=xy&&sensor?sensor.map(v=>fmt(v,angular?3:6)).join(' / ')+(angular?' mrad':' (무차원)'):'—';
+ drawPDHistory();
+}
+function message(text,error=false){$('fsm-message').textContent=text;$('fsm-message').className='message'+(error?' error':'')}
+async function sendCommand(data){const res=await fetch('/api/fsm',{method:'POST',headers:{'Content-Type':'application/json','X-FSM-Control-Key':FSM_KEY},body:JSON.stringify({...data,client_id:clientId,sequence:++sequence}),signal:AbortSignal.timeout(3000)});const reply=await res.json();if(!res.ok)throw Error(reply.error||'FSM 명령 실패');return reply}
+async function drain(){if(sending)return;sending=true;const version=stopVersion;try{while(pending){const data=pending;pending=null;await sendCommand(data);inputsDirty=false;if(version===stopVersion)message('명령이 FSM에 전달됐습니다.');await new Promise(resolve=>setTimeout(resolve,80))}}catch(e){pending=null;if(version===stopVersion)message(e.message,true)}finally{sending=false;if(pending)drain()}}
+function enqueue(data){if(!fresh(fsm)||!fsm.control_available||fsm.automatic_search_active){message(fsm&&fsm.automatic_search_active?'궤적 운전 중입니다. 정지 버튼으로 중단할 수 있습니다.':(fsm&&(fsm.fault||fsm.error))||'FSM 연결 확인 중',true);return}pending=data;drain()}
+function padTarget(event){const r=$('fsm-control').getBoundingClientRect(),L=58,T=16,S=Math.min(r.width-L-16,r.height-T-44),x=event.clientX-r.left,y=event.clientY-r.top;if(!dragging&&(x<L||x>L+S||y<T||y>T+S))return;let dx=((x-L)/S*2-1)*150,dy=(1-(y-T)/S*2)*150;const norm=Math.hypot(dx,dy);if(norm>149.99){dx*=149.99/norm;dy*=149.99/norm}enqueue({action:'set',x_mA:Number((-dx).toFixed(4)),y_mA:Number((-dy).toFixed(4))})}
+$('fsm-control').addEventListener('pointerdown',e=>{if(!fresh(fsm)||!fsm.control_available||fsm.automatic_search_active||fsm.operation_mode===2||commandTrail.length>1)return;const r=e.currentTarget.getBoundingClientRect(),S=Math.min(r.width-74,r.height-60),x=e.clientX-r.left,y=e.clientY-r.top;if(x<58||x>58+S||y<16||y>16+S)return;dragging=true;e.currentTarget.setPointerCapture(e.pointerId);padTarget(e)});
+$('fsm-control').addEventListener('pointermove',e=>{if(dragging)padTarget(e)});for(const name of ['pointerup','pointercancel'])$('fsm-control').addEventListener(name,()=>dragging=false);
+for(const [id,axis,sign] of [['fsm-left','x',1],['fsm-right','x',-1],['fsm-up','y',-1],['fsm-down','y',1]])$(id).onclick=()=>enqueue({action:'nudge',axis,delta_mA:sign*Number($('step').value)});
+$('fsm-zero').onclick=()=>enqueue({action:'zero'});$('fsm-apply').onclick=()=>enqueue({action:'set',x_mA:Number($('current-x').value),y_mA:Number($('current-y').value)});
+$('fsm-stop').onclick=async()=>{stopVersion++;pending=null;dragging=false;try{await sendCommand({action:'stop'});inputsDirty=false;message('구동 전류를 0 mA로 복귀했습니다.')}catch(e){message(e.message,true)}};
+$('fsm-resume').onclick=async()=>{try{await sendCommand({action:'resume'});message('FSM 제어 연결을 확인했습니다.')}catch(e){message(e.message,true)}};
+for(const id of ['current-x','current-y'])$(id).addEventListener('input',()=>inputsDirty=true);
+$('psd-view').onchange=draw;$('fsm-view').onchange=draw;$('clear-trails').onclick=()=>{clearTrails();draw()};
+async function poll(){
+ if(polling)return;polling=true;
+ try{
+  const res=await fetch('/api/state',{cache:'no-store',signal:AbortSignal.timeout(2000)});if(!res.ok)throw Error('HTTP '+res.status);
+  const s=await res.json(),p=s.psd,pd=s.pd,c=s.calibration;
+  updatePD(pd,c.PD_voltage_conversion);
+  const newEpoch=c.raw_trajectory_epoch||c.PSD_display_epoch;if(newEpoch!==epoch){epoch=newEpoch;clearTrails();if(['square','psd_square'].includes(c.raw_trajectory_shape))$('fsm-view').value='optical_mrad'}
+  const shapeLabel=c.raw_trajectory_shape==='square'?'정사각형':'∞';
+  const trajectoryStatus=c.raw_trajectory_shape==='psd_square'?'PSD 정사각형용 FSM 운전 중':'FSM '+shapeLabel+' 궤적 운전 중';
+  origin=c.raw_trajectory_origin_xy||origin;amplitudes=c.raw_trajectory_amplitude_xy||amplitudes;run=c.raw_trajectory_statistics||null;startedTime=c.raw_trajectory_started_time||null;
+  latest=p;fsm=s.fsm;const nativePSDReadoutAvailable=Number.isFinite(p.x_mm)&&Number.isFinite(p.y_mm);p.position_available=Boolean(p.position_available)&&p.relative_percent<100&&p.edge_margin_mm>0;
+  const flive=fresh(fsm),plive=fresh(p),xy=flive&&fsm.operation_mode===2,manual=flive&&fsm.control_available&&!fsm.automatic_search_active;
+  const pinnEnabled=Boolean(c.PINN_active&&c.PSD_feedback_loop_active),pinnLive=pinnEnabled&&flive&&plive&&fsm.automatic_search_active&&!fsm.fault&&Date.now()/1000-c.PSD_PINN_updated_time<4;
+  const phaseLabels={deliberate_mispoint:'빔 이탈 확인',searching:'FSM 탐색 중',confirming_PD_and_PSD:'PD·PSD 감지 확인',real_PD_PSD_reacquired:'PINN 전환 준비'};
+  const acquisitionActive=flive&&fsm.automatic_search_active&&!pinnEnabled&&Boolean(phaseLabels[c.PAT_phase]);
+  $('pinn-panel').hidden=!c.PSD_PINN_artifact;
+  $('pinn-status').textContent=pinnLive?'PINN 제어 중':acquisitionActive?phaseLabels[c.PAT_phase]:pinnEnabled?'제어 갱신 확인 중':xy?'시험 종료 · FSM 위치 유지':'PINN 제어 정지';$('pinn-status').className='badge '+(pinnLive?'ok':'warn');
+  $('pinn-acquisition').textContent=Number.isFinite(c.PD_acquisition_threshold_V)?'PD 감지 기준: 현재 CH1 > '+fmt(c.PD_acquisition_threshold_V*1000,2)+' mV · PD 감지 기록 '+(c.acquisition_PD_seen_count||0)+'회 · PSD 좌표가 유효한 경우 PINN 중심 제어로 전환':'PSD 실측 피드백으로 중심을 유지합니다.';
+  const pinnReference=c.PSD_PINN_reference_mm;
+  $('pinn-reference').textContent=Array.isArray(pinnReference)?pinnReference.map(v=>fmt(v,3)).join(' / '):'—';
+  $('pinn-error').textContent=plive&&p.position_available&&Array.isArray(pinnReference)?fmt(Math.hypot(p.x_mm-pinnReference[0],p.y_mm-pinnReference[1]),4):'—';
+  $('pinn-count').textContent=Number.isFinite(c.PSD_PINN_sample_count)?c.PSD_PINN_sample_count+' 회':'—';
+  $('server-status').textContent='실제 장치 연결됨';$('server-status').className='badge ok';$('fsm-status').textContent=!flive?'FSM 연결 확인':fsm.fault?'FSM 제어 중단':fsm.automatic_search_active?(pinnEnabled?'PINN 위치 제어 중':acquisitionActive?phaseLabels[c.PAT_phase]:c.raw_trajectory_active?trajectoryStatus:'FSM 자동 측정 중'):xy?'FSM 위치 유지 중':'FSM 수동 제어 가능';$('fsm-status').className='badge '+(flive&&!fsm.fault?'ok':'warn');
+  document.querySelectorAll('.motion').forEach(b=>b.disabled=!manual);$('fsm-stop').disabled=!flive;$('fsm-resume').hidden=!flive||!fsm.fault;$('fsm-control').classList.toggle('unavailable',!manual||xy);
+  $('fsm-command-mode').textContent=flive?(xy?'내부 XY 위치 제어':'구동 전류 제어'):'—';$('fsm-target-xy').textContent=xy?fsm.target_xy.map(v=>fmt(v,6)).join(' / '):'—';
+  $('fsm-x').textContent=flive?fmt(fsm.feedback_xy[0],6):'—';$('fsm-y').textContent=flive?fmt(fsm.feedback_xy[1],6):'—';$('fsm-current').textContent=flive?fsm.actual_current_mA.map(v=>fmt(v,1)).join(' / '):'—';$('fsm-temp').textContent=flive?fmt(fsm.temperature_C,1):'—';
+  $('servo-error').textContent=run&&Number.isFinite(run.command_to_mirror_error_xy)?fmt(run.command_to_mirror_error_xy,6):'—';
+  if(fsm.fault||fsm.error)message(fsm.fault||fsm.error,true);else message(fsm.automatic_search_active?(pinnEnabled?'PSD 실측 오차를 PINN이 계산해 FSM 자세 목표를 보정하는 중입니다.':c.raw_trajectory_active?(c.raw_trajectory_shape==='psd_square'?'PSD 정사각형을 위한 FSM 명령을 보내는 중입니다. PSD는 실측 위치를 표시합니다.':'FSM에 '+shapeLabel+' 위치 명령을 직접 보내는 중입니다. PSD는 위치를 읽습니다.'):'FSM 위치별 센서 반응을 측정하는 중입니다.'):xy?'FSM은 현재 위치에 고정돼 있습니다.':'클릭·드래그 또는 방향 버튼으로 조절하세요.');
+  if(xy){const commandKey=fsm.target_xy.join('/');if(commandKey!==lastCommand){lastCommand=commandKey;append(commandTrail,delta(fsm.target_xy))}if(fsm.sample_count!==lastFSM){lastFSM=fsm.sample_count;append(sensorTrail,delta(fsm.feedback_xy))}}
+  if(flive&&!inputsDirty)for(const [id,v] of [['current-x',fsm.target_current_mA[0]],['current-y',fsm.target_current_mA[1]]])if(document.activeElement!==$(id))$(id).value=fmt(v,1);
+  if(plive&&p.sample_count!==lastPSD){lastPSD=p.sample_count;if(p.position_available)append(psdTrail,[p.x_mm,p.y_mm])}
+  $('x').textContent=plive&&p.position_available?fmt(p.x_mm):'—';$('y').textContent=plive&&p.position_available?fmt(p.y_mm):'—';$('psd-position').textContent=plive&&p.position_available?[p.x_mm,p.y_mm].map(v=>fmt(v)).join(' / '):'—';$('power').textContent=plive&&nativePSDReadoutAvailable?fmt(p.relative_percent,1):'—';$('pd').textContent=fresh(pd)?fmt(pd.mean_voltage_V*1000,2):'—';
+  $('fill').style.width=(plive&&nativePSDReadoutAvailable?Math.max(0,Math.min(100,p.relative_percent)):0)+'%';$('psd-status').textContent=plive&&p.position_available?'PSD 실제 측정 중':'PSD 신호 확인';$('psd-status').className='badge '+(plive&&p.position_available&&p.relative_percent>1?'ok':'warn');
+  $('notice').textContent=!plive?(p.error||'PSD 연결 확인 중'):!p.position_available?'PSD 유효 위치를 읽을 수 없습니다.':p.relative_percent<=1?'PSD 신호가 약합니다.':'';
+  $('sample-gap').textContent=flive&&plive?fmt(Math.abs(fsm.time-p.time)*1000,1):'—';$('elapsed').textContent=run?fmt(run.elapsed_s,1)+' s':startedTime?fmt(Date.now()/1000-startedTime,1)+' s':'—';
+  $('command-psd-rms').textContent=run&&Number.isFinite(run.command_PSD_RMS_mm)?fmt(run.command_PSD_RMS_mm*1000,1):'—';$('trajectory-law').textContent=pinnEnabled?'PINN · PSD '+(c.PSD_trajectory==='hold'?'중심 유지':'목표 궤적 추종'):c.raw_trajectory_active?(c.raw_trajectory_command_label||'X: sin(φ) · Y: sin(2φ)'):c.raw_trajectory_epoch?'운전 종료':'—';
+  $('run-status').textContent=run?'독립 PSD 기록 '+run.PSD_sample_count+'개 · 완료 주기 '+run.completed_cycles+'회 · FSM 센서–PSD 실측 RMS '+fmt(run.sensor_PSD_comparison_RMS_mm*1000,1)+' µm · 사전 교정식은 고정':'실측 기록 대기 중';
+  $('connection').textContent='FSM '+fsm.port+' · PSD '+p.port+' · 화면 10 Hz';$('time').textContent='최근 측정 '+new Date(s.server_time).toLocaleTimeString('ko-KR');$('calibration').textContent=c.activity||'실제 장치 측정 중';draw();
+ }catch(e){latest=null;fsm=null;pending=null;updatePD(null);document.querySelectorAll('.motion').forEach(b=>b.disabled=true);$('fsm-stop').disabled=true;$('server-status').textContent='데이터 다시 연결 중';$('server-status').className='badge warn';$('fsm-status').textContent='FSM 연결 확인';$('psd-status').textContent='PSD 연결 확인';$('x').textContent=$('y').textContent=$('power').textContent='—';draw()}
+ finally{polling=false}
+}
+window.addEventListener('resize',draw);draw();poll();setInterval(poll,100);
+</script>
+</html>

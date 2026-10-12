@@ -1,0 +1,37 @@
+{
+  "updated": "2026-10-12T23:14:49.792832+09:00",
+  "model": "PDA015C2",
+  "wavelength_nm": 1562,
+  "responsivity_reference_wavelength_nm": 1550,
+  "responsivity_A_per_W": 0.95,
+  "gain_high_z_V_per_A": 50000.0,
+  "gain_50ohm_V_per_A": 25000.0,
+  "default_load": "high_z",
+  "physical_load_verified": false,
+  "high_z_assumption": "Direct BNC into the oscilloscope; external 50-ohm termination is not verified",
+  "dark_voltage_V": 0.03397659208333333,
+  "dark_artifact": "mounted_power_comparison_20261012_231416.json",
+  "absolute_optical_power_calibrated": false,
+  "power_display_kind": "nominal_estimate",
+  "responsivity_at_1562nm_measured": false,
+  "scope_DC_verified": true,
+  "scope_direct_BNC_probe_ratio_verified": true,
+  "scope_settings": {
+    ":CHANnel1:PROBe?": "1.000000e+00",
+    ":CHANnel1:COUPling?": "DC",
+    ":CHANnel1:SCALe?": "2.000000e+00"
+  },
+  "formula": "P_est_W = (CH1_VAVG_V - dark_voltage_V) / (nominal_responsivity_A_per_W * selected_load_gain_V_per_A)",
+  "specification_source": "https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=4&pn=PDA015C2",
+  "default_display_unit": "dBm",
+  "display_units": [
+    "dBm",
+    "uW",
+    "raw_CH1_mV"
+  ],
+  "dBm_reference_W": 0.001,
+  "dBm_formula": "10 * log10(P_est_W / 0.001)",
+  "GUI_verification_artifact": "PD_current_GUI_verification_20261012.json",
+  "power_readout_source": "current_CH1_VAVG_sample",
+  "historical_peak_used": false
+}

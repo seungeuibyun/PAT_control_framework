@@ -1,0 +1,11 @@
+{
+  "state": "passed",
+  "simulation": true,
+  "withheld_PSD_rms_mm": 0.00018583861882397887,
+  "maximum_gradient_finite_difference_error": 6.822261866545887e-09,
+  "initial_error_mm": 0.45486261662176636,
+  "final_error_after_unobserved_disturbance_mm": 0.00010292715870926195,
+  "source_stage_position_supplied_to_controller": false,
+  "command_slew_and_measured_hull_verified": true,
+  "serialization_verified": true
+}

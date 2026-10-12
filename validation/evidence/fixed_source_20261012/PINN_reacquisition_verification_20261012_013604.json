@@ -1,0 +1,92 @@
+{
+  "state": "passed",
+  "checked": "2026-10-12T01:36:57.785020+09:00",
+  "controller_artifact": "PSD_PINN_20261012_013604.json",
+  "PD_loss_mean_V": 0.04,
+  "PD_trigger_threshold_V": 0.233988462,
+  "capture_PSD_mm": [
+    0.4761,
+    -0.01183
+  ],
+  "capture_PD_samples_V": [
+    2.118195,
+    1.779398,
+    1.723679
+  ],
+  "acquisition_elapsed_s": 26.345865299983416,
+  "first_settled_PINN_elapsed_s": 12.54214979999233,
+  "recent_center_RMS_mm": 0.009903582108273374,
+  "recent_sample_count": 8,
+  "PINN_tracking_continues": true,
+  "laser_or_stage_set_commands_issued": false,
+  "physical_PD_PSD_center_coincidence_verified": false,
+  "active_state": {
+    "fsm": {
+      "connected": true,
+      "control_available": true,
+      "port": "COM5",
+      "max_current_mA": 150.0,
+      "target_current_mA": [
+        0.0,
+        0.0
+      ],
+      "control_mode": "device_xy_servo",
+      "target_xy": [
+        -0.009132,
+        0.059137999999999996
+      ],
+      "fault": null,
+      "automatic_search_active": true,
+      "time": 1791736617.7122805,
+      "sample_count": 165564,
+      "feedback_xy": [
+        -0.0091684740036726,
+        0.059089820832014084
+      ],
+      "actual_current_mA": [
+        25.602787733078003,
+        -7.2450535371899605
+      ],
+      "applied_current_mA": [
+        0.0,
+        0.0
+      ],
+      "applied_xy": [
+        -0.00913199968636036,
+        0.05913800001144409
+      ],
+      "device_status": 16,
+      "operation_mode": 2,
+      "temperature_C": 28.375,
+      "moving": false,
+      "error": null,
+      "age_s": 0.07030224800109863
+    },
+    "psd": {
+      "port": "COM4",
+      "connected": true,
+      "sample_count": 335292,
+      "identity": "1IDCONEX-PSD10-GE",
+      "x_mm": 0.001464,
+      "y_mm": -0.002626,
+      "relative_percent": 14.0,
+      "time": 1791736617.7770283,
+      "error": null,
+      "position_available": true,
+      "signal_state": "measuring",
+      "edge_margin_mm": 4.997374,
+      "age_s": 0.0055544376373291016
+    },
+    "pd": {
+      "connected": true,
+      "channel": "CH1",
+      "scope_ip": "192.168.10.2",
+      "scale_V_per_div": 2.0,
+      "mean_voltage_V": 2.619665,
+      "time": 1791736617.2541637,
+      "error": null,
+      "identity": "RIGOL TECHNOLOGIES,MSO1104Z,DS1ZD190300117,00.04.04.SP1",
+      "age_s": 0.528419017791748
+    }
+  }
+}
