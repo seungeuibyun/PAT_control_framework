@@ -1,0 +1,6 @@
+{
+  "family": "acquisition",
+  "controller": "frozen_pinn",
+  "seed": 9000,
+  "duration_s": 3.0
+}

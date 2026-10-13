@@ -1,0 +1,6 @@
+{
+  "family": "fast_sweep",
+  "controller": "pid",
+  "seed": 9111,
+  "duration_s": 20.0
+}

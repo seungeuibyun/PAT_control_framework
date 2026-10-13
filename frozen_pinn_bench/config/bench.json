@@ -1,0 +1,595 @@
+{
+  "id": "pat_bench",
+  "status": "Frozen-PINN predictive pointing on the bench as built (photo 2026-10-13). Analytical branch: bench model; empirical branch: measured logs (see docs/empirical_protocol.md).",
+  "question": "With the same PSD information, does disturbance-context prediction beat a tuned PID when the disturbance is the Tx translation the rail can actually produce (HAPS-scaled)?",
+  "receiver": {
+    "mode": "direct",
+    "link_distance_m": 0.3,
+    "reducer_magnification": 10.0,
+    "fsm_to_psd_m": 0.2,
+    "fsm_to_pda_m": 0.2,
+    "beam_radius_at_detectors_m": 0.00055,
+    "principle": "A Tx translation D keeps the beam direction; the Rx reducer shifts the beam by D/10 at the FSM and detectors, with no angle. The PSD sees the position; the FSM re-centres it by tilting over the FSM-detector lever: theta_x = D / (2 * 10 * 0.2 m)."
+  },
+  "rail": {
+    "axis": "x (horizontal, in the FSM plane of incidence: optical gain 2)",
+    "travel_m": 0.004,
+    "max_speed_m_s": 0.02,
+    "max_accel_m_s2": 0.2,
+    "note": "Travel = PDF FSM limit (1 mrad mechanical) mapped through the lever; beyond it the planned receiver gimbal takes over (not modelled). Speed/acceleration are assumptions until the stage is identified."
+  },
+  "pdf_equivalence": {
+    "pdf_receiver_reducer": 0.1,
+    "pdf_link_distance_m": 20000.0,
+    "rail_m_per_pdf_aperture_rad": 20.0,
+    "haps_lateral_m_per_rail_m": 1000.0,
+    "derivation": "Equal FSM angle: PDF theta = alpha/(2*0.1); bench theta = D/(2*10*0.2 m) -> D = 20 m x alpha. A HAPS lateral displacement X at 20 km gives alpha = X/20 km -> D = X/1000. PDF Table I Tx angle std 5 urad -> 100 um. Detector-plane shift per mechanical FSM angle is 0.4 um/urad in both (lever 0.2 m = PDF lens f)."
+  },
+  "optics": {
+    "wavelength_m": 1.53e-06,
+    "collimated_waist_diameter_m": 0.00087,
+    "expander_magnification": 10.0,
+    "tx_to_fsm_m": 0.3,
+    "fsm_mirror_diameter_m": 0.015,
+    "fsm_aoi_deg": 45.0,
+    "fsm_optical_gain": [
+      [
+        2.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.4142135623730951
+      ]
+    ],
+    "lens_focal_length_m": 0.2,
+    "lens_clear_aperture_m": 0.0254,
+    "splitter_reflection": 0.3,
+    "splitter_transmission": 0.7,
+    "pda_radius_m": 7.5e-05,
+    "psd_width_m": 0.01,
+    "power_at_fsm_w": 0.001,
+    "pda_branch_nd_transmission": 1.0,
+    "pda_responsivity_a_per_w": 0.95,
+    "pda_gain_v_per_a": 25000.0,
+    "pda_max_output_v": 5.0,
+    "pupil_grid": 2048,
+    "pupil_sampling_m": 7.5e-05,
+    "response_half_width_m": 0.0005
+  },
+  "fsm": {
+    "bandwidth_hz": [
+      300.0,
+      400.0
+    ],
+    "damping": 0.7,
+    "jitter_rms_rad": 2.2e-05,
+    "static_offset_rms_rad": 4e-05,
+    "command_latency_s": 0.001,
+    "command_period_s": 0.002,
+    "software_range_rad": 0.005
+  },
+  "psd": {
+    "frame_period_s": 0.02,
+    "capture_after_query_s": 0.01,
+    "delivery_after_query_s": 0.02,
+    "analog_lpf_hz": 175.0,
+    "position_noise_rms_m": 5e-06,
+    "adc_bits": 12
+  },
+  "calibration": {
+    "fsm_gain_error_rms": 0.02,
+    "fsm_coupling_error_rms": 0.01,
+    "target_error_rms_m": 3e-06
+  },
+  "simulation": {
+    "dt_s": 0.0005,
+    "warmup_s": 2.0
+  },
+  "disturbance": {
+    "units": "Rail position D [m] along x; stored as the equivalent FSM-plane angle D / (reducer x PSD lever).",
+    "families": {
+      "station": {
+        "kind": "rail",
+        "description": "HAPS station keeping: slow drift + platform sway + Tx pointing jitter (PDF 5 urad std ~ 100 um)",
+        "drift_rms_m": [
+          0.0005,
+          0.0012
+        ],
+        "drift_corner_hz": [
+          0.03,
+          0.15
+        ],
+        "sway_rms_m": [
+          0.0002,
+          0.0006
+        ],
+        "sway_hz": [
+          0.1,
+          0.5
+        ],
+        "sway_damping": [
+          0.05,
+          0.2
+        ],
+        "jitter_rms_m": [
+          6e-05,
+          0.00014
+        ],
+        "jitter_low_hz": [
+          0.5,
+          1.0
+        ],
+        "jitter_high_hz": [
+          2.0,
+          5.0
+        ]
+      },
+      "sweep": {
+        "kind": "rail",
+        "description": "HAPS lateral motion at 1-5 m/s (rail 1-5 mm/s), reversing within the FSM range, plus the same jitter",
+        "sweep": {
+          "amplitude_m": [
+            0.002,
+            0.0035
+          ],
+          "speed_m_s": [
+            0.001,
+            0.005
+          ]
+        },
+        "jitter_rms_m": [
+          6e-05,
+          0.00014
+        ],
+        "jitter_low_hz": [
+          0.5,
+          1.0
+        ],
+        "jitter_high_hz": [
+          2.0,
+          5.0
+        ]
+      },
+      "fast_jitter": {
+        "kind": "rail",
+        "description": "Station keeping with faster jitter (2-10 Hz); amplitude limited by the stage acceleration",
+        "drift_rms_m": [
+          0.0005,
+          0.0012
+        ],
+        "drift_corner_hz": [
+          0.03,
+          0.15
+        ],
+        "sway_rms_m": [
+          0.0002,
+          0.0006
+        ],
+        "sway_hz": [
+          0.1,
+          0.5
+        ],
+        "sway_damping": [
+          0.05,
+          0.2
+        ],
+        "jitter_rms_m": [
+          6e-05,
+          0.00014
+        ],
+        "jitter_low_hz": [
+          2.0,
+          3.0
+        ],
+        "jitter_high_hz": [
+          6.0,
+          10.0
+        ]
+      },
+      "fast_sweep": {
+        "kind": "rail",
+        "description": "HAPS lateral motion at 6-14 m/s (rail 6-14 mm/s) within the FSM range, plus jitter",
+        "sweep": {
+          "amplitude_m": [
+            0.0025,
+            0.0035
+          ],
+          "speed_m_s": [
+            0.006,
+            0.014
+          ],
+          "accel_fraction": 0.4
+        },
+        "jitter_rms_m": [
+          6e-05,
+          0.00014
+        ],
+        "jitter_low_hz": [
+          0.5,
+          1.0
+        ],
+        "jitter_high_hz": [
+          2.0,
+          5.0
+        ]
+      },
+      "vibration": {
+        "kind": "rail",
+        "description": "Station keeping plus 6-18 Hz structural vibration injected in software into the FSM command (hidden from all controllers)",
+        "drift_rms_m": [
+          0.0005,
+          0.0012
+        ],
+        "drift_corner_hz": [
+          0.03,
+          0.15
+        ],
+        "sway_rms_m": [
+          0.0002,
+          0.0006
+        ],
+        "sway_hz": [
+          0.1,
+          0.5
+        ],
+        "sway_damping": [
+          0.05,
+          0.2
+        ],
+        "jitter_rms_m": [
+          6e-05,
+          0.00014
+        ],
+        "jitter_low_hz": [
+          0.5,
+          1.0
+        ],
+        "jitter_high_hz": [
+          2.0,
+          5.0
+        ],
+        "injected_lines": {
+          "lines": [
+            1,
+            2
+          ],
+          "line_hz": [
+            6.0,
+            18.0
+          ],
+          "line_amp_rad": [
+            6e-05,
+            0.0002
+          ],
+          "line_drift_frac": [
+            0.0,
+            0.08
+          ],
+          "line_drift_period_s": [
+            5.0,
+            20.0
+          ],
+          "line_am_depth": [
+            0.0,
+            0.3
+          ],
+          "line_am_period_s": [
+            3.0,
+            10.0
+          ]
+        }
+      },
+      "acquisition": {
+        "kind": "rail",
+        "description": "Demo: rail held 2 mm off (beam starts off target) with small jitter",
+        "offset_m": 0.002,
+        "jitter_rms_m": [
+          3e-05,
+          3e-05
+        ],
+        "jitter_low_hz": [
+          0.5,
+          0.5
+        ],
+        "jitter_high_hz": [
+          3.0,
+          3.0
+        ]
+      }
+    }
+  },
+  "controllers": {
+    "assumed_capture_after_query_s": 0.01,
+    "pid_grid": {
+      "kp": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.5,
+        0.7
+      ],
+      "ki_per_s": [
+        5.0,
+        10.0,
+        20.0,
+        30.0,
+        45.0,
+        60.0,
+        90.0,
+        120.0
+      ],
+      "kd_s": [
+        0.0,
+        0.001,
+        0.003,
+        0.006,
+        0.01,
+        0.02,
+        0.04
+      ],
+      "derivative_filter_s": 0.01
+    },
+    "pid_tuning_episodes": 8,
+    "history_frames": 12,
+    "horizon_frames": 4,
+    "frozen_features": 512,
+    "swim_candidate_pairs": 40000,
+    "ridge_grid": [
+      1e-09,
+      1e-08,
+      1e-07,
+      1e-06,
+      1e-05,
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ],
+    "online_window_frames": 400,
+    "online_refit_every_frames": 50,
+    "online_prior_grid": [
+      10.0,
+      30.0,
+      100.0,
+      300.0,
+      1000.0,
+      3000.0
+    ],
+    "pinn_command": {
+      "features": 24,
+      "feature_scale": 6.0,
+      "collocation": 48,
+      "physics_weight": 10000.0,
+      "rate_weight": 0.0001,
+      "seed": 11,
+      "horizon_grid": [
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          8,
+          3
+        ]
+      ],
+      "selection_episodes": 8,
+      "selection_seed0": 1500,
+      "selection_duration_s": 20.0
+    },
+    "lanczos_a": 3,
+    "seed": 7
+  },
+  "evaluation": {
+    "episodes": {
+      "train": {
+        "family": [
+          "station",
+          "fast_sweep",
+          "vibration"
+        ],
+        "count": 48,
+        "duration_s": 30.0,
+        "seed0": 1000
+      },
+      "validation": {
+        "family": [
+          "station",
+          "fast_sweep",
+          "vibration"
+        ],
+        "count": 12,
+        "duration_s": 30.0,
+        "seed0": 1500
+      },
+      "test_id": {
+        "family": "station",
+        "count": 16,
+        "duration_s": 20.0,
+        "seed0": 2000
+      },
+      "test_sweep": {
+        "family": "sweep",
+        "count": 16,
+        "duration_s": 20.0,
+        "seed0": 3000
+      },
+      "test_fast_jitter": {
+        "family": "fast_jitter",
+        "count": 16,
+        "duration_s": 20.0,
+        "seed0": 4000
+      },
+      "test_fast_sweep": {
+        "family": "fast_sweep",
+        "count": 16,
+        "duration_s": 20.0,
+        "seed0": 5000
+      },
+      "test_vibration": {
+        "family": "vibration",
+        "count": 16,
+        "duration_s": 20.0,
+        "seed0": 6000
+      }
+    },
+    "outage_fraction_of_aligned_power": 0.5,
+    "pdf_receiver_reducer": 0.1,
+    "power_metrics": [
+      {
+        "name": "pda_bench",
+        "type": "direct_beam",
+        "source": "pda",
+        "note": "PDA015C2 (75 um radius) in the unfocused ~0.55 mm beam, as built"
+      },
+      {
+        "name": "pdf_focal_equiv",
+        "type": "gaussian_focal",
+        "source": "psd",
+        "wavelength_m": 1.55e-06,
+        "focal_length_m": 0.2,
+        "pupil_radius_m": 0.02036,
+        "aperture_radius_m": 0.005,
+        "detector_radius_m": 7.5e-05,
+        "note": "Same residual in the PDF receiver: 20 km beam (w 204 mm) clipped by the 100 mm aperture, reduced x0.1, f = 200 mm, 75 um PDA"
+      }
+    ],
+    "sensitivity": {
+      "fsm_jitter_5urad": {
+        "description": "MR-15-30 closed-loop jitter 5 urad instead of 22 urad",
+        "overrides": {
+          "fsm.jitter_rms_rad": 5e-06
+        }
+      },
+      "psd_capture_15ms_true_10ms_assumed": {
+        "description": "CONEX-PSD capture 15 ms after query while controllers assume 10 ms",
+        "true_capture_after_query_s": 0.015
+      },
+      "psd_capture_5ms_true_10ms_assumed": {
+        "description": "CONEX-PSD capture 5 ms after query (older data) while controllers assume 10 ms",
+        "true_capture_after_query_s": 0.005
+      },
+      "pda_lever_22cm": {
+        "description": "FSM-PDA path 22 cm while FSM-PSD is 20 cm",
+        "overrides": {
+          "receiver.fsm_to_pda_m": 0.22
+        }
+      },
+      "sweep_rail_accel_1m_s2": {
+        "description": "Sweep set with a 1 m/s^2 stage (faster reversals)",
+        "episodes": "test_sweep",
+        "overrides": {
+          "rail.max_accel_m_s2": 1.0
+        }
+      },
+      "fast_jitter_rail_accel_1m_s2": {
+        "description": "Fast-jitter set with a 1 m/s^2 stage (larger 2-10 Hz jitter)",
+        "episodes": "test_fast_jitter",
+        "overrides": {
+          "rail.max_accel_m_s2": 1.0
+        }
+      },
+      "slow_actuator_20hz": {
+        "description": "Gimbal-class actuator: 20 Hz closed-loop bandwidth on both axes (tests the FSM-dynamics residual)",
+        "overrides": {
+          "fsm.bandwidth_hz": [
+            20.0,
+            20.0
+          ]
+        }
+      }
+    },
+    "pid_tuning": {
+      "mode": "per_scenario",
+      "note": "PID re-tuned on training seeds of each test family (favourable to PID); Frozen-PINN trained once on the mixed training set"
+    },
+    "comm": {
+      "haps_receiver": {
+        "wavelength_m": 1.55e-06,
+        "focal_length_m": 0.2,
+        "pupil_radius_m": 0.02036,
+        "aperture_radius_m": 0.005
+      },
+      "detector_radii_m": [
+        7.5e-05,
+        2.5e-05
+      ],
+      "detector_note": "75 um: PDA015C2 class (as built); 25 um: high-speed small-area detector (higher bandwidth, more pointing-sensitive)",
+      "fec_ber": 0.0038,
+      "qam_orders": [
+        4,
+        16,
+        64,
+        256
+      ],
+      "aligned_snr_db": [
+        10.0,
+        36.0,
+        1.0
+      ],
+      "operating_margin_db": 3.0,
+      "symbol_rate_baud": 10000000.0,
+      "payload_fraction": 0.824,
+      "frame_s": 0.0005,
+      "pilots": 128,
+      "assumption": "IM/DD with signal-independent noise: electrical SNR = aligned SNR x (normalized optical power)^2. Operating point: aligned SNR 3 dB above the 64-QAM HD-FEC threshold.",
+      "pilot_note": "Pilot block (128 symbols) every 0.5 ms: shorter than the ~1 ms coherence time set by the 300-400 Hz FSM jitter on a 25 um detector (2.6% overhead at 10 Mbaud). Used only by the symbol-level figures; the analytic BER/outage/rate assume known gain."
+    },
+    "severity": {
+      "sweep_speeds_m_s": [
+        0.001,
+        0.002,
+        0.004,
+        0.006,
+        0.008,
+        0.01,
+        0.012,
+        0.014
+      ],
+      "vibration_scales": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        1.25
+      ],
+      "episodes": 6,
+      "duration_s": 12.0,
+      "seed0": 7000
+    },
+    "demo": {
+      "family": "acquisition",
+      "seed": 9000,
+      "duration_s": 3.0
+    }
+  },
+  "assumptions": [
+    "receiver.reducer_magnification = 10: Rx barrel taken as the same 10x expander reversed (wide ends face each other). Check: beam at the FSM ~0.9 mm (reducer) vs ~9 mm (not).",
+    "receiver.fsm_to_psd_m = fsm_to_pda_m = 0.20: FSM-cube 10 cm + cube-detector 10 cm, estimated from the photo; measure both paths.",
+    "receiver.beam_radius_at_detectors_m = 0.55 mm: F230APC waist 0.435 mm propagated ~0.3 m equivalent; measure with a beam card/profiler.",
+    "The CCM1-4ER/M holds the BS021 30:70 cube (split, no focusing). No lens before the PSD/PDA.",
+    "FSM folds in the horizontal plane: the horizontal rail motion uses the in-plane axis (optical gain 2).",
+    "rail.max_speed_m_s = 20 mm/s and max_accel_m_s2 = 0.2 m/s^2: stage not yet identified. The 1 m/s^2 sensitivity run covers a faster stage.",
+    "Rail translation is pure x; stage yaw/pitch runout is not modelled (yaw of 10 urad would add ~20 um at the detectors).",
+    "The rail profile is taken as executed exactly; the stage servo error becomes part of the measured disturbance on the bench.",
+    "Timing and FSM/PSD models as in pat_bench_v2 (MR-E-3 latency 1 ms, period 2 ms; PSD capture 10 ms after query).",
+    "Disturbance families are declared HAPS-scaled test inputs, not measured HAPS data."
+  ],
+  "sources": {
+    "cube_mount": "https://www.3doptix.com/catalog/optomechanics/cage-construction/thorlabs/CCM1-4ER%2FM",
+    "fsm": "https://www.optotune.com/wp-content/uploads/OptotuneMR-15-30datasheet.pdf",
+    "psd": "https://api.p1.mks.com/medias/sys_master/npresources/h42/h11/9954535440414/EDH0254En%20CONEX-PSD%20Controller%20Documentation/EDH0254En-CONEX-PSD-Controller-Documentation.pdf",
+    "splitter": "https://www.thorlabs.com/item/BS021",
+    "collimator": "https://www.thorlabs.com/item/F230APC-1550",
+    "reference_pdf": "docs/reference/PAT_reference.pdf"
+  },
+  "history": "Successor of pat_bench_v3 (legacy/pat_bench_v3_history); earlier studies in legacy/."
+}

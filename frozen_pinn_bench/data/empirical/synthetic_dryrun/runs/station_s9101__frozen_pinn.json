@@ -1,0 +1,6 @@
+{
+  "family": "station",
+  "controller": "frozen_pinn",
+  "seed": 9101,
+  "duration_s": 20.0
+}

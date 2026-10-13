@@ -1,0 +1,6 @@
+{
+  "family": "fast_sweep",
+  "controller": "frozen_pinn",
+  "seed": 9110,
+  "duration_s": 20.0
+}
